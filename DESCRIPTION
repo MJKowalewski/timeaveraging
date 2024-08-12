@@ -1,11 +1,19 @@
 Package: timeaveraging
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Time-Averaging Package for Paleontologists
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Depends: R (>= 4.0.0)
+Imports: vegan (>= 2.6-4)
+Date: 2024-08-12
+Author: Michal Kowalewski
+Maintainer: Michal Kowalewski <kowalewski@ufl.edu>
+Description: A package for analyzing age distirbutions of individually
+    dated specimens to estimate time-averaging and model age distributions
+License: CC0
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/mjkowalewski/timeaveraging
+BugReports: https://github.com/mjkowalewski/timeaveraging
+RoxygenNote: 7.3.2
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
