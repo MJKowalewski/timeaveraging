@@ -1,0 +1,19 @@
+---
+title: "timeaveraging"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{timeaveraging}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(timeaveraging)
+```

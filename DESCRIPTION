@@ -6,8 +6,7 @@ Depends: R (>= 4.0.0)
 Date: 2024-08-12
 Author: Michal Kowalewski
 Maintainer: Michal Kowalewski <kowalewski@ufl.edu>
-Description: Package 'timeaveraging' estimates moments and models
- age distributions of individually dated specimens. 
+Description: Package timeaveraging estimates moments and models age distributions of individually dated specimens. 
 License: CC0
 Encoding: UTF-8
 LazyData: true

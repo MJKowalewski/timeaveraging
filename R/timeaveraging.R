@@ -16,14 +16,8 @@
 #' @docType package
 #'
 #' @examples
-#' # Version and citation
-#' packageVersion('timeaveraging')
-#' citation('timeaveraging')
-#'
-#' example dataset (bahamas)
-#' data(bahamas)
 #'
 #' # moments
-#' moments(bahamas)
+#' moments(bahamas$spec$carbonateAge)
 #'
 NULL

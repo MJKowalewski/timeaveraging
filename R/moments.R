@@ -6,10 +6,6 @@
 #' @return A vector containing the following components:
 #'   \item{medianage}{median age of specimens in a given sample}
 #'
-#' @examples
-#'
-#' data(bahamas)
-#' out1 <- moments(bahamas$carbonateAge)
 #'
 #' @export
 
