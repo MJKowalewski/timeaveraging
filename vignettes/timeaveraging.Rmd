@@ -14,6 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+The current version of the package time-averaging can be downloaded from Github:
+devtools::install_github('mjkowalewski/timeaveraging', build_vignettes = TRUE)
+
 ```{r setup}
 library(timeaveraging)
 ```

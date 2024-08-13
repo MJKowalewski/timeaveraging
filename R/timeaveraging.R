@@ -12,12 +12,12 @@
 #'
 #' @author Michal Kowalewski \email{kowalewski@@ufl.edu}
 #' @name timeveraging
-#' @aliases timeaveragin
+#' @aliases timeaveraging
 #' @docType package
 #'
 #' @examples
 #'
-#' # moments
-#' moments(bahamas$spec$carbonateAge)
+#' # agemoments
+#' agemoments(bahamas$spec$carbonateAge)
 #'
 NULL

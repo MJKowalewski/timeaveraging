@@ -2,10 +2,9 @@
 % Please edit documentation in R/timeaveraging.R
 \docType{package}
 \name{timeveraging}
-\alias{timeaveraging}
 \alias{timeaveraging-package}
 \alias{timeveraging}
-\alias{timeaveragin}
+\alias{timeaveraging}
 \title{timeaveraging: assessing age distirbutions of individually dated fossil specimens}
 \description{
 timeaveraging package provides common measures of age distributions
@@ -21,8 +20,8 @@ assessing moments of age distributions
 }
 \examples{
 
-# moments
-moments(bahamas$spec$carbonateAge)
+# agemoments
+agemoments(bahamas$spec$carbonateAge)
 
 }
 \seealso{
