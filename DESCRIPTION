@@ -3,12 +3,11 @@ Type: Package
 Title: Time-Averaging Package for Paleontologists
 Version: 0.1.0
 Depends: R (>= 4.0.0)
-Imports: vegan (>= 2.6-4)
 Date: 2024-08-12
 Author: Michal Kowalewski
 Maintainer: Michal Kowalewski <kowalewski@ufl.edu>
-Description: A package for analyzing age distirbutions of individually
-    dated specimens to estimate time-averaging and model age distributions
+Description: Package 'timeaveraging' estimates moments and models
+ age distributions of individually dated specimens. 
 License: CC0
 Encoding: UTF-8
 LazyData: true
