@@ -11,7 +11,7 @@
 #' assessing moments of age distributions
 #'
 #' @author Michal Kowalewski \email{kowalewski@@ufl.edu}
-#' @name timeveraging
+#' @name timeaveraging
 #' @aliases timeaveraging
 #' @docType package
 #'
