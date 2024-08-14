@@ -22,7 +22,12 @@ Computes univariate statistics for a sample of
 individually dated specimens.
 }
 \details{
-The function returns basic moments,
+The function returns basic descriptive univariate statistics,
 including mean, median, standard deviation, interquartile range,
 sample skewness, and L-skewness
+}
+\examples{
+
+agemoments(bahamas$spec$carbonateAge)
+
 }

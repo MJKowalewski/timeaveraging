@@ -14,9 +14,18 @@ knitr::opts_chunk$set(
 )
 ```
 
+Package time-averaging assembles functions for analyzing age distribution of individually dated fossil specimens. The package is designed for datasets that include posteriorly calibrated ages (typically calibrated radiocarbon or amino-acid racemization dates). Example datasets are included.
+
 The current version of the package time-averaging can be downloaded from Github:
 devtools::install_github('mjkowalewski/timeaveraging', build_vignettes = TRUE)
 
 ```{r setup}
 library(timeaveraging)
 ```
+
+The following functions are included:
+*agemoments* - a function that provides basic descriptors of age distributions and can be used with other functions
+
+The following example datasets are provided:
+*bahamas* - a list with two dataframes (spec - specimen level data, and post - posterior probability distributions for each specimen) for 30 specimens of echinoids and 30 specimens of mollusks.
+

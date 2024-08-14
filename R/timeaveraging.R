@@ -1,6 +1,6 @@
-#' timeaveraging: assessing age distirbutions of individually dated fossil specimens
+#' timeaveraging: assessing age distributions of individually dated fossil specimens
 #'
-#' timeaveraging package provides common measures of age distributions
+#' The package 'timeaveraging' provides common measures of age distributions
 #' while taking in consideration dating uncertainty estimated via
 #' Bayesian posterior calibrations (specimen-level age probability
 #' distributions)
@@ -16,6 +16,10 @@
 #' @docType package
 #'
 #' @examples
+#'
+#' # data examples
+#' data(bahamas)
+#' str(bahamas)
 #'
 #' # agemoments
 #' agemoments(bahamas$spec$carbonateAge)

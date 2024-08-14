@@ -3,12 +3,11 @@
 #' Computes univariate statistics for a sample of
 #' individually dated specimens.
 #'
-#' @details The function returns basic moments,
+#' @details The function returns basic descriptive univariate statistics,
 #' including mean, median, standard deviation, interquartile range,
 #' sample skewness, and L-skewness
 #'
 #' @param age A variable containing ages (e.g., radiocarbon dates)
-#'
 #'
 #' @return A vector containing the following components:
 #'   \item{mean}{arithmetic mean age of specimens in a sample}
@@ -16,6 +15,10 @@
 #'   \item{std.dev}{standard deviation of specimen ages in a sample}
 #'   \item{iqr}{interquartile age range of specimens in a sample}
 #'   \item{g1}{sample skewness estimate g1 of specimens in a sample}
+#'
+#' @examples
+#'
+#' agemoments(bahamas$spec$carbonateAge)
 #'
 #' @export
 
