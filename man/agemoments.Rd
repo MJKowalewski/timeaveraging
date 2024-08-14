@@ -13,9 +13,10 @@ agemoments(age)
 A vector containing the following components:
   \item{mean}{arithmetic mean age of specimens in a sample}
   \item{median}{median age of specimens in a sample}
-  \item{std.dev}{standard deviation of specimen ages in a sample}
+  \item{sdev}{standard deviation of specimen ages in a sample}
   \item{iqr}{interquartile age range of specimens in a sample}
   \item{g1}{sample skewness estimate g1 of specimens in a sample}
+  \item{t3}{sample L-skewness estimate t3}
 }
 \description{
 Computes univariate statistics for a sample of
