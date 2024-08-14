@@ -11,7 +11,6 @@
 #'
 #' @author Michal Kowalewski \email{kowalewski@@ufl.edu}
 #' @name timeaveraging
-#' @aliases timeaveraging
 #' @docType package
 #'
 #' @examples
@@ -24,4 +23,5 @@
 #' agemoments(bahamas$spec$carbonateAge)
 #'
 #' @importFrom lmom samlmu
+#'
 NULL
