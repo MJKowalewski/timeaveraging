@@ -10,12 +10,12 @@
 #' @param age A variable containing ages (e.g., radiocarbon dates)
 #'
 #' @return A vector containing the following components:
-#'   \item{mean}{arithmetic mean age of specimens in a sample}
-#'   \item{median}{median age of specimens in a sample}
-#'   \item{sdev}{standard deviation of specimen ages in a sample}
-#'   \item{iqr}{interquartile age range of specimens in a sample}
-#'   \item{g1}{sample skewness estimate g1 of specimens in a sample}
-#'   \item{t3}{sample L-skewness estimate t3}
+#'   \item{mean}{arithmetic mean of specimen ages}
+#'   \item{median}{median of specimen ages}
+#'   \item{sdev}{standard deviation of specimen ages}
+#'   \item{iqr}{interquartile age range of specimen ages}
+#'   \item{g1}{sample skewness estimate g1 of specimen ages}
+#'   \item{t3}{sample L-skewness estimate t3 of specimen ages}
 #'
 #' @examples
 #'
@@ -35,7 +35,8 @@ agemoments <- function(age) {
   iqr <- stats::IQR(age)
   m3 <- sum((age-mean(age))^3)/length(age)
   s3 <- stats::var(age)^(3/2)
-  t3 <- lmom::samlmu(age)[3]
+  t3 <- as.numeric(lmom::samlmu(age)[3])
   return(c(mean = meanage, median = medianage,
            sdev = std, iqr = iqr, g1 = m3/s3, t3 = t3))
 }
+

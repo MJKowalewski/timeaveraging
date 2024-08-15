@@ -21,8 +21,12 @@ assessing moments of age distributions
 data(bahamas)
 str(bahamas)
 
-# agemoments
+# agemoments function
 agemoments(bahamas$spec$carbonateAge)
+
+# postdist function
+postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
+id=bahamas$post$Specimen, idname='Specimen')
 
 }
 \seealso{
