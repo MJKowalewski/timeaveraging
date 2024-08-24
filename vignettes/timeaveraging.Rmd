@@ -27,7 +27,7 @@ library(PaleoFidelity)
 
 The following functions and datasets are included:
 
-*agemoments* - a function that provides basic descriptors of age distributions and can be used with other functions
+*postdist* - a function that creates Monte Carlo distributions from posterior probabilities and provides basic descriptors of specimen-level posterior distributions and sample-level statistics of time-averaging. Retruns a list of class 'postdist'
 
 *bahamas* - a list with two dataframes
 

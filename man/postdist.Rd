@@ -23,11 +23,16 @@ should be returned. If FALSE, a single data.frame with statistical descriptors
 is returned. If TRUE, a list of two date.frames is returned.}
 }
 \value{
-A list with two data.frames (if outdate=TRUE) and a data.frame (if outdate=False):
-  \item{stats}{returns means, variances and medians of posterior age distributions
-   and exact means and medians calculated directly from the probability distribution}
-  \item{outdata}{archives Monte Carlo approximations of posterior probability distributions,
-  returned if outdata=TRUE}
+A list with the following items:
+  \item{spec}{returns specimen-level estimates of mean age, age variance,
+  and median age based on Monte Carlo sample from posterior age distributions
+  and "exact" mean ages, age variances, and median ages calculated directly
+  from posterior probabilities; see details}
+  \item{sample}{returns a numerical vector with sample-level estimates of
+  central tendency, dispersion, and skewness; see details}
+  \item{outdata}{returns a numerical matrix with n='size' rows and n=number of specimens
+  columns with Monte Carlo ages based on posterior probability distributions.
+  NOTE: returned when outdata = TRUE}
 }
 \description{
 Generates specimen/date-level Monte Carlo distributions of age uncertainties
@@ -35,15 +40,65 @@ based on Bayesian posterior probabilities of ages
 }
 \details{
 Radiocarbon calibration provides posterior probabilities of age values
-given the observed uncalibrated radiocarbon age. This function generates a Monte Carlo
-approximation of posterior probability distribution converting probabilities into
-a predefined number of age values representing age uncertainty around a given date.
-The number of distributions equals the number of dated specimens. The function preserves
-the order of id values in the original file.
+given the observed uncalibrated radiocarbon ages. The function preserves the
+order of id values in the input data. This function generates a Monte Carlo
+approximation of posterior probability distribution converting probabilities
+into a predefined number of age values representing age uncertainty around
+a given date and calculates specimen level and sample level statistics and
+time-averaging measures.
+
+If outdata=TRUE, the function returns (item: "outdata") a matrix with separate
+Monte Carlo distributions for all dates. The number of distributions
+(columns in the matrix) equals the number of dated specimens.
+
+The function returns (item: "specs") statistics for individual dates including
+means, variances, and medians of posterior distributions calculated from
+Monte Carlo distributions and "exact" means, variances, and medians estimated
+directly from the posterior probabilities.
+
+The function returns (item: "sample") sample-level statistics include:
+
+TAV - Total Assemblage Variance (variance of all Monte-Carlo ages)
+
+TAVexact - "exact" TAV based on posterior probabilities
+
+AEV - Age Estimation Variance calculated as average variance of posterior
+Monte-Carlo distributions and estimating dating uncertainty
+
+AEVexact (AEV estimated directly from posterior probabilities)
+
+ETA (ES) - Estimated Time-Averaging corrected for dating uncertainty
+calculated as 2 * square root of TAV-AEV (2 standard deviations)
+
+ETAexact - Same as ETA but calculated using TAXexact and AEVexact
+OTA (observed time-averaging that does not correct for age uncertainty,
+calculated as 2*standard deviation of ages (means or medians of posterior
+distributions) in a sample
+
+iqr - interquartile range calculated from mean or median ages of posterior
+distributions
+
+g1 - skewness, the third moment about the mean calculated from mean or
+median ages of posterior distributions
+
+t3 - L-skeweness calculated using function \code{\link[lmom]{samlmu}}
+from package "lmom".
+
+See Ritter et al. 2023 for TAV, AEV, and ETA equations.
 }
 \examples{
 
 postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
 id=bahamas$post$Specimen, idname='Specimen')
 
+}
+\references{
+Hosking, JRM, 2023, L-Moments. R package, version 3.0.
+https://CRAN.R-project.org/package=lmom
+
+Ritter, M, Erthal F, Kosnik, MA, Kowalewski, M, Coimbra, CJ,
+Caron, F, Kaufman, DS, 2023, Onshore-offshore trends in the temporal
+resolution of molluscan death assemblages: how age-frequency
+distributions reveal Quaternary sea-level history.
+Palaios, 38: 148-157. http://dx.doi.org/10.2110/palo.2021.041
 }

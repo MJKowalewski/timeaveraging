@@ -19,8 +19,8 @@
 #' data(bahamas)
 #' str(bahamas)
 #'
-#' # agemoments function
-#' agemoments(bahamas$spec$carbonateAge)
+#' data(florida)
+#' str(florida)
 #'
 #' # postdist function
 #' postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
