@@ -15,3 +15,4 @@ for (i in unique(group)) {
 }
 round(out3[,-1],2)
 
+?timeavestats

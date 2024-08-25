@@ -16,7 +16,7 @@
 #' TAV (total variance), TAVexact ("exact" total variance), AEV (age estimation
 #' variance), AEVexact ("exact" age estimation variance), ETA (estimated time
 #' averaging), ETAexact ("exact" estimated time averaging), OTA (uncorrected
-#' estimate of time averaging - 2 x std.dev), iqr (interquartile range of ages),
+#' estimate of time averaging - 2 times std.dev), iqr (interquartile range of ages),
 #' g1 (parametric sample skeweness estimate), t3 (l-skewness)
 #'
 #' The corresponding bootstrap statistics with 95 percent naive bootstrap
