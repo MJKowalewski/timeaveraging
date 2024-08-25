@@ -82,6 +82,7 @@
 #' id=bahamas$post$Specimen, idname='Specimen')
 #'
 #' @importFrom lmom samlmu
+#' @importFrom stats var sd median
 #'
 #' @export
 #'

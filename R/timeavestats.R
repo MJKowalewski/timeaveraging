@@ -34,7 +34,6 @@
 #' timeavestats(out1, times=100)
 #'
 #' @importFrom lmom samlmu
-#' @importFrom stats var sd median
 #'
 #' @export
 #'
@@ -59,7 +58,7 @@ timeavestats <- function(x, times=100) {
   for (i in 1:times) {
     sel.sam <- sample(1:nspec, replace=T)     # select a bootstrap sample of specimens
     # the next line is not vectorized and slows down the script (which would be pretty fast otherwise)
-    ETAboot <- 2 * sqrt(stats::var(as.vector(x$outdata[,sel.sam])) - mean(x$spec$ex.var[sel.sam]))
+    ETAboot <- 2 * sqrt(var(as.vector(x$outdata[,sel.sam])) - mean(x$spec$ex.var[sel.sam]))
     sel.spec <- (sel.sam - 1)*iter + sample(1:iter, size=nspec, replace=T) # select ages for bootstrap sample from posterior distributions
     rsam <- y[sel.spec] # select a sample of ages for a bootstrap sample rsam
     out1 <- rbind(out1, rsam) # append
@@ -74,7 +73,7 @@ timeavestats <- function(x, times=100) {
   samcts2corr <- samcts2 - (stats::median(samcts2) - obs.stats$median) # simple bootstrap correction
   samcts2corrLL <- as.vector(stats::quantile(samcts2corr, .025))
   samcts2corrUL <- as.vector(stats::quantile(samcts2corr, .975))
-  samsd <- apply(out1, 2, function(x) 2 * stats::sd(x))
+  samsd <- apply(out1, 2, function(x) 2*sd(x))
   samsdcorr <- samsd - (mean(samsd) - obs.stats$OTA) # simple bootstrap correction
   samsdcorrLL <- as.vector(stats::quantile(samsdcorr, .025))
   samsdcorrUL <- as.vector(stats::quantile(samsdcorr, .975))

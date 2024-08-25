@@ -3,7 +3,7 @@ Type: Package
 Title: Time-Averaging Package for Paleontologists
 Version: 0.1.0
 Depends: R (>= 4.0.0)
-Imports: lmom (>= 3.0)
+Imports: lmom (>= 3.0), stats
 Date: 2024-08-12
 Author: Michal Kowalewski
 Maintainer: Michal Kowalewski <kowalewski@ufl.edu>
