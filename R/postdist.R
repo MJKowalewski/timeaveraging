@@ -130,7 +130,7 @@ postdist <- function(age, prob, id, idname=NULL, size=10000, outdata=FALSE) {
   g1 <- (sum((v$mean-mean(v$mean))^3)/length(v$mean)) / stats::var(v$mean)^(3/2)
   t3 <- as.numeric(lmom::samlmu(v$mean)[3])
   specstats <- data.frame(v, ex.mean, ex.var, ex.med)
-  samplestats <- c(TAV=tot.var, TAVexact=ex.tot.var, AEV=mean(v$var),
+  samplestats <- c(mean=mean(v$mean), median=stats::median(v$median), TAV=tot.var, TAVexact=ex.tot.var, AEV=mean(v$var),
                    AEVexact=mean(ex.var), ETA=2*sqrt(tot.var-mean(v$var)),
                    ETAexact=2*sqrt(ex.tot.var-mean(ex.var)),
                    OTA=std2, iqr=IQ, g1=g1, t3=t3)
@@ -139,9 +139,9 @@ postdist <- function(age, prob, id, idname=NULL, size=10000, outdata=FALSE) {
     z2 <- matrix(z[,2], size, length(unique(id)))
     colnames(z2) <- unique(id)
     rownames(z2) <- 1:size
-    out1 <- list(sample=samplestats, spec=specstats, outdata=z2)
+    out1 <- list(sample=samplestats, spec=specstats, outdata=z2, samid=idname)
   }
-  if (!outdata) out1 <- list(sample=samplestats, spec=specstats)
+  if (!outdata) out1 <- list(sample=samplestats, spec=specstats, samid=idname)
   class(out1) <- append(class(out1), "postdist")
   return(out1)
 }
