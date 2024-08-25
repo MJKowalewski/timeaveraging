@@ -1,8 +1,4 @@
-library(lmom)
-out1 <- postdist(age=florida$post$cal.BP, prob=florida$post$probability,
-         id=florida$post$UniqueID, idname='id', size=10000, outdata = TRUE)
-round(out1$sample,2)
-
+library(timeaveraging)
 leodia <- bahamas$spec$sample[which(bahamas$spec$taxon == 'Leodia')]
 tucetona <- bahamas$spec$sample[which(bahamas$spec$taxon == 'Tucetona')]
 bah <- bahamas$post
@@ -19,12 +15,3 @@ for (i in unique(group)) {
 }
 round(out3[,-1],2)
 
-bahamas$spec$taxon
-c <- timeavestats(out1, 100)
-round(c,2)
-str(out1$sample)
-quantile(b[[2]], probs=c(0.025, 0.975))
-out1$sample[5]
-head(b[[1]])
-cor(b[[1]][3,], b[[1]][4,])
-b[[2]]
