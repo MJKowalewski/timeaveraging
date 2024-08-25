@@ -1,4 +1,6 @@
 library(timeaveraging)
+?timeavestats
+
 leodia <- bahamas$spec$sample[which(bahamas$spec$taxon == 'Leodia')]
 tucetona <- bahamas$spec$sample[which(bahamas$spec$taxon == 'Tucetona')]
 bah <- bahamas$post
