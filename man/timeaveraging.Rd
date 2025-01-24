@@ -7,7 +7,7 @@
 \title{timeaveraging: assessing age distributions of fossil specimens}
 \description{
 The package 'timeaveraging' provides functions to assess and visualize
-age distributions while inorporating dating uncertainty estimated via
+age distributions while incorporating dating uncertainty estimated via
 Bayesian posterior calibrations (specimen-level age probability
 distributions)
 }
@@ -26,7 +26,7 @@ str(florida)
 
 # postdist function
 postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
-id=bahamas$post$Specimen, idname='Specimen')
+id=bahamas$post$Specimen)
 
 }
 \seealso{

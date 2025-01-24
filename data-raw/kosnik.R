@@ -24,17 +24,25 @@ c14AgesFromPosterior <- function(c14probs, reps) {
   c14probs$Age <- ceiling(c14probs$Age) # summary table
   sumTable <- matrix(0, nrow=length(c14specs), ncol=reps)
   for (s in 1:length(c14specs))
-    { specData <- c14probs[(c14probs$Specimen == c14specs[s]),] # probabilities sum to 1
+    { specData <- c14probs[(c14probs$Specimen == c14specs[s]),]
+    # probabilities sum to 1
     specData$Probability <- specData$Probability / sum(specData$Probability)
     specData$mc <- round(specData$Probability*reps)
+    # MK comment: The next line eliminates ages with probabilities less than 1/(2*reps)
     specData <- specData[(specData$mc > 0),]
-    rAges <- rep(specData$Age,specData$mc) ## if rounding results in not enogh many ages increase the most under represented by one.
+    rAges <- rep(specData$Age,specData$mc)
+    ## if rounding results in not enogh many ages increase the most under represented by one.
   while (length(rAges) < reps) {
+    # MK comment: not sure why you have parenthesis in the next line (don't think is needed?)
     specData$mc1 <- (specData$Probability*reps)
-    specData$mcd <- specData$mc - specData$mc1 ## avoids particularlly nasty situation when multiple rows match
+    specData$mcd <- specData$mc - specData$mc1
+    ## avoids particularlly nasty situation when multiple rows match
     logRows <- which(specData$mcd == min(specData$mcd))
     if (length(logRows) > (reps - length(rAges)))
     logRows <- sample(logRows,(reps - length(rAges)))
+    # MK comment: next line adds extra ages to age bins
+    # by finding those ages that are most underrepresented (logRows indices)
+    # (the largest prob value < 1/(2*reps) ???)
     specData[logRows,'mc'] <- specData[logRows,'mc'] + 1
     rAges <- rep(specData$Age,specData$mc)
     }
