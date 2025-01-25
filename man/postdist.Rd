@@ -35,7 +35,9 @@ a given date.
 }
 \examples{
 
-postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
+out1 <- postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
 id=bahamas$post$Specimen)
+
+dim(out1)
 
 }
