@@ -49,7 +49,7 @@
 #' information should be returned by the function.
 #'
 #' @return A dataframe with sample-level statistics (if simple=T) or
-#' a list with four items (if simple=F):
+#' a list with five items (if simple=F):
 #'   \item{my.stats}{returns a dataframe (if simple = T) or the first item in
 #'   the list of items (if simple = F). This is a single set of numerical values
 #'   providing summary statistics for a given sample}
