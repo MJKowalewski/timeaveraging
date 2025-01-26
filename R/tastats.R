@@ -5,7 +5,7 @@
 #' \code{\link{postdist}}
 #'
 #' @details If argument 'simple' is set to TRUE (default), the function returns
-#' a vector with summary statistics for the analyzed sample.
+#' a one-row dataframe with summary statistics for the analyzed sample.
 #' If argument 'simple' is set to FALSE, the function returns a list
 #'
 #' The following summary statistics are returned:
@@ -29,9 +29,12 @@
 #' TAV - Total Assemblage Variance calculated as variance of all Monte-Carlo
 #' ages (see Ritter et al. 2023)
 #'
-#' ETA (ES) - Estimated Time-Averaging (2 standard deviations) corrected for
+#' ETA - Estimated Time-Averaging (2 standard deviations) corrected for
 #' dating uncertainty calculated as 2 * square root of TAV-AEV
 #' (see Ritter et al. 2023)
+#'
+#' IQR - Estimated IQR corrected for dating uncertainty computed as ETA/2
+#' multiplied by iq.age/std.age (see Tomasovych et al. 2023)
 #'
 #' g1 - skewness, the third moment about the mean calculated from mean or
 #' median ages of posterior distributions
@@ -82,8 +85,14 @@
 #' resolution of molluscan death assemblages: how age-frequency
 #' distributions reveal Quaternary sea-level history.
 #' Palaios, 38: 148-157. http://dx.doi.org/10.2110/palo.2021.041
+#'
+#' Tomašových, A., Kidwell, S.M. and Dai, R., (2023), A downcore increase
+#' in time averaging is the null expectation from the transit of death assemblages
+#' through a mixed layer. Paleobiology, 49(3), pp.527-562.
+#' https://doi.org/10.1017/pab.2022.42
+#'
 
-tastats <- function(x, use.median=T, simple=T) {
+tastats <- function(x, use.median=TRUE, simple=TRUE) {
   if (!('postdist' %in% class(x))) stop('object of the class "postdist" is required')
   nspec <- nrow(x) # number of specimens
   if (use.median) y <- apply(x, 1, stats::median)
@@ -97,11 +106,12 @@ tastats <- function(x, use.median=T, simple=T) {
   AEV <- mean(apply(x, 1, var))
   TAV <- stats::var(as.vector(x))
   ETA <- 2*sqrt(TAV - AEV)
+  IQR <- (ETA/2)*(iq.age/std.age)
   g1F <- function(x) (sum((x-mean(x))^3)/length(x)) / stats::var(x)^(3/2)
   g1 <- g1F(y)
   l3F <- function(x) as.numeric(lmom::samlmu(x)[3])
   l3 <- l3F(y)
-  my.stats <- data.frame(median.age, mean.age, std.age, iq.age, AEV, TAV, ETA, g1, l3)
+  my.stats <- data.frame(median.age, mean.age, std.age, iq.age, AEV, TAV, ETA, IQR, g1, l3)
   if (simple) return(my.stats)
   if (!simple) return(list(my.stats, ages=y, n=nspec, num.replic.ages=iter, age.estimate))
 }

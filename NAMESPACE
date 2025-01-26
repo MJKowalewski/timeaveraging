@@ -2,6 +2,7 @@
 
 export(postdist)
 export(tastats)
+export(tastats.boot)
 importFrom(lmom,samlmu)
 importFrom(stats,IQR)
 importFrom(stats,median)
