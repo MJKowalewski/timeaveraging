@@ -93,7 +93,7 @@
 #'
 
 tastats <- function(x, use.median=TRUE, simple=TRUE) {
-  if (!('postdist' %in% class(x))) stop('object of the class "postdist" is required')
+  # if (!('postdist' %in% class(x))) warning('object of the class "postdist" expected')
   nspec <- nrow(x) # number of specimens
   if (use.median) y <- apply(x, 1, stats::median)
   if (!use.median) y <- apply(x, 1, function(x) sum(x)/length(x))
@@ -112,6 +112,6 @@ tastats <- function(x, use.median=TRUE, simple=TRUE) {
   l3F <- function(x) as.numeric(lmom::samlmu(x)[3])
   l3 <- l3F(y)
   my.stats <- data.frame(median.age, mean.age, std.age, iq.age, AEV, TAV, ETA, IQR, g1, l3)
-  if (simple) return(my.stats)
-  if (!simple) return(list(my.stats, ages=y, n=nspec, num.replic.ages=iter, age.estimate))
+  if (simple) return(t(my.stats))
+  if (!simple) return(list(my.stats, ages=y, n=nspec, num.replic=iter, age.estimate))
 }

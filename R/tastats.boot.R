@@ -74,7 +74,7 @@
 #' https://doi.org/10.1017/pab.2022.42
 #'
 tastats.boot <- function(x, fixed=TRUE, iter=100, bootdata=FALSE) {
-  if (!('postdist' %in% class(x))) stop('object of the class "postdist" is required')
+#  if (!('postdist' %in% class(x))) warning('object of the class "postdist" is required')
   g1F <- function(x) (sum((x-mean(x))^3)/length(x)) / stats::var(x)^(3/2)
   l3F <- function(x) as.numeric(lmom::samlmu(x)[3])
   outboot <- NULL
@@ -91,6 +91,15 @@ tastats.boot <- function(x, fixed=TRUE, iter=100, bootdata=FALSE) {
     boot.stats <- data.frame(boot.ETA, boot.IQR, boot.g1, boot.l3, no.iter=iter, n=nrow(x))
     outboot <- rbind(outboot, boot.stats)
   }
+  obs.values <- tastats(x)
+  corr.ETA <- obs.values[7,] - mean(outboot$boot.ETA)
+  corr.IQR <- obs.values[8,] - mean(outboot$boot.IQR)
+  corr.g1 <- obs.values[9,] - mean(outboot$boot.g1)
+  corr.l3 <- obs.values[10,] - mean(outboot$boot.l3)
+  outboot$boot.ETA <- outboot$boot.ETA + corr.ETA
+  outboot$boot.IQR <- outboot$boot.IQR + corr.IQR
+  outboot$boot.g1 <- outboot$boot.g1 + corr.g1
+  outboot$boot.l3 <- outboot$boot.l3 + corr.l3
   mean.and.cf <- function(x) c(mean=mean(x),
                                stats::quantile(x, prob=c(0.025, 0.25, 0.75, 0.975)))
   outsummary <- apply(outboot[,1:4], 2, mean.and.cf)

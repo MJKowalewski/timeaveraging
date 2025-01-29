@@ -42,6 +42,6 @@ postdist <- function(age, prob, id, size=10000) {
     out <- matrix(out1, size, length(unique(id)))
     colnames(out) <- unique(id)
     out <- out[,order(colnames(out))]
-    class(out) <- append(class(out), "postdist")
+#    class(out) <- append(class(out), "postdist")
     return(t(out))
 }
