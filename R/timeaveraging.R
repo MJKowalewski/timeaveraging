@@ -10,22 +10,27 @@
 #' assessing moments of age distributions
 #'
 #' @author Michal Kowalewski \email{kowalewski@@ufl.edu}
-#' @name timeaveraging
-#' @docType package
 #'
 #' @examples
 #'
 #' # data examples
-#' data(bahamas)
-#' str(bahamas)
-#'
 #' data(florida)
 #' str(florida)
 #'
-#' # postdist function
-#' postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
+#' out1 <- postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
 #' id=bahamas$post$Specimen)
+#' out1[1:5, 1:5]
 #'
+#' out2 <- postdist(age=florida$post$cal.BP, prob=florida$post$probability,
+#' id=florida$post$UniqueID)
+#' out1[1:5, 1:5]
+#'
+#' tastats(out1)
+#' out2 <- tastats(out1, simple=FALSE)
+#' str(out2)
+#'
+#'
+#' @importFrom boot boot boot.ci
 #' @importFrom lmom samlmu
 #'
-NULL
+"_PACKAGE"
