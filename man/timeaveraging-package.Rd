@@ -2,9 +2,9 @@
 % Please edit documentation in R/timeaveraging.R
 \docType{package}
 \name{timeaveraging-package}
-\alias{timeaveraging-package}
 \alias{timeaveraging}
-\title{packagename: timeaveraging: analysis of age distributions of fossils}
+\alias{timeaveraging-package}
+\title{timeaveraging: analysis of age distributions of fossils}
 \description{
 Analyze and model age distributions of individually dated fossils or
 other geomaterials. Estimate moments of age distributions, including
@@ -58,3 +58,4 @@ Daniele Scarponi \email{daniele.scarponi@unibo.it} (conceptual contributor)
 
 Martin Zuschin \email{martin.zuschin@univie.ac.at} (conceptual contributor)
 }
+\keyword{internal}
