@@ -5,7 +5,14 @@ Version: 0.1.0
 Depends: R (>= 4.0.0)
 Imports: boot, lmom (>= 3.0), stats
 Date: 2024-08-12
-Author: Michał Kowalewski, Adam Tomašových, Matthew A. Kosnik, Rafał Nawrot, Daniele Scarponi, Martin Zuschin
+Authors@R: c(
+    person("Michał", "Kowalewski", email = "kowalewski@ufl.edu", role = c("aut", "cre")),
+    person("Adam", "Tomašových", role = "aut"),
+    person("Mattew", "Kosnik", role = "aut"),
+    person("Rafał", "Nawrot", role = "aut"),
+    person("Daniele", "Scarponi", role = "aut"),
+    person("Martin", "Zuschin", role = "aut")
+  )
 Maintainer: Michał Kowalewski <kowalewski@ufl.edu>
 Description: Package 'timeaveraging' estimates moments and models age distributions of individually dated specimens. 
 License: CC0
