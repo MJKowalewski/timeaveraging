@@ -4,22 +4,24 @@
 \name{timeaveraging-package}
 \alias{timeaveraging}
 \alias{timeaveraging-package}
-\title{timeaveraging: assessing age distributions of fossil specimens}
+\title{timeaveraging: analysis of age distributions of fossils}
 \description{
-The package 'timeaveraging' provides functions to assess and visualize
-age distributions while incorporating dating uncertainty estimated via
-Bayesian posterior calibrations (specimen-level age probability
-distributions)
+Analyze and model age distributions of individually dated fossils or
+other geomaterials. Estimate moments of age distributions, including
+multiple measures of dispersion corrected for excess variance produced by
+dating errors.
 }
 \details{
-The current version of the package provides functions for
-assessing moments of age distributions
+The current beta version is limited to single-sample functions and can be
+used to estimate moments of distribution and bootstrap confidence intervals
+around them. For each dated specimen, the probability age distribution (e.g.,
+Bayesian calibration of an radiocarbon age) must be provided.
 }
 \examples{
 
 # data examples
 data(florida)
-str(florida)
+head(florida)
 
 out1 <- postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
 id=bahamas$post$Specimen)
@@ -44,5 +46,15 @@ Useful links:
 
 }
 \author{
-Michal Kowalewski \email{kowalewski@ufl.edu}
+Michał Kowalewski \email{kowalewski@ufl.edu} (author)
+
+Adam Tomašových \email{adam.tomasovych@savba.sk} (author)
+
+Matthew A. Kosnik \email{mkosnik@gmail.com} (author)
+
+Rafał Nawrot \email{rafal.nawrot@univie.ac.at} (author)
+
+Daniele Scarponi \email{daniele.scarponi@unibo.it} (conceptual contributor)
+
+Martin Zuschin \email{martin.zuschin@univie.ac.at} (conceptual contributor)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/postdist.R
 \name{postdist}
 \alias{postdist}
-\title{postdist}
+\title{Monte Carlo Approximation of Age Probability Distribution}
 \usage{
 postdist(age, prob, id, size = 10000)
 }
@@ -27,11 +27,11 @@ Generates specimen/date-level Monte Carlo distributions of age uncertainties
 based on Bayesian posterior probabilities of ages
 }
 \details{
-Radiocarbon calibration provides posterior probabilities of age values
-given the observed uncalibrated radiocarbon ages. This function generates a
-Monte Carlo approximation of posterior probability distribution converting probabilities
-into a predefined number of age values representing age uncertainty around
-a given date.
+This function produces a Monte Carlo sample of ages based
+on the posterior probability age estimates. It should provide robust
+approximation of the distribution moments when adequate number of replicate
+ages are used (10000 is recommended here, although 1000 may be sufficient).
+The resulting object of the class 'postdist' is used by other functions.
 }
 \examples{
 
