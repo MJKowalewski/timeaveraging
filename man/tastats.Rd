@@ -7,7 +7,7 @@
 tastats(x, use.median = TRUE, simple = TRUE)
 }
 \arguments{
-\item{x}{A list returned by \code{\link{postdist}} function}
+\item{x}{An object of the class "postdist" returned by the \code{\link{postdist}} function}
 
 \item{use.median}{A logical argument (default=TRUE) to determine whether to
 use median age (TRUE) or mean age (FALSE) to estimate central tendency of the
