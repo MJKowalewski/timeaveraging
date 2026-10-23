@@ -23,7 +23,7 @@ The current version of the package time-averaging can be downloaded from Github.
 ```{r installing timeavraging package, eval = FALSE}
 install.packages('devtools')
 library(devtools)
-devtools::install_github('mjkowalewski/timeaveraging', build_vignettes = TRUE)
+pak::pak('MJKowalewski/timeaveraging')
 ```
 
 ```{r}
@@ -37,8 +37,7 @@ library(timeaveraging)
 
 *tastats* - computes sample-level statistics of age uncertainties based on Bayesian posterior probabilities of ages
 
-*tastats.boot* - computes sample-level bootstrap estimates for selected sample-level
-statistics
+*tastats.boot* - computes sample-level bootstrap estimates for selected sample-level statistics
 
 **DATASETS**
 
@@ -52,9 +51,10 @@ statistics
 
 *postdist* 
 
-The function *postdist* generates specimen-level Monte Carlo distributions of age estimates for each dated specimen based on Bayesian posterior probability distribution. Returns a list or matrix of class 'postdist'.
+The function *postdist* generates specimen-level Monte Carlo distributions of age estimates for each dated specimen based on Bayesian posterior probability distribution. Returns aN object of class 'postdist'.
 
-NOTE: Radiocarbon calibration provides posterior probabilities of age values given the observed uncalibrated radiocarbon ages. The function *postdist* generates a Monte Carlo approximation of posterior probability distribution converting probabilities into a predefined number of age values representing age uncertainty around a given date. If age bins are not annual, the function adjust probabilities to ensure they sum up to 1.
+NOTE: Radiocarbon (or other) calibration provides posterior probabilities of age values given the observed uncalibrated ages. The function *postdist* generates a Monte Carlo approximation of posterior probability distribution converting probabilities into a predefined number of age values representing age uncertainty around a given date. If age bins are not annual, the function 
+adjusts probabilities to yearly resolution and ensures they sum up to 1.
 
 Arguments:
 
