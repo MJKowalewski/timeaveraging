@@ -1,12 +1,13 @@
-#' timeaveraging: analysis of age distributions of fossils
+#' @title packagename: timeaveraging: analysis of age distributions of fossils
 #'
-#' Analyze and model age distributions of individually dated fossils or
+#' @description Analyze and model age distributions of individually dated fossils or
 #' other geomaterials. Estimate moments of age distributions, including
 #' multiple measures of dispersion corrected for excess variance produced by
 #' dating errors.
 #'
+#' @aliases timeaveraging
 #'
-#' The current beta version is limited to single-sample functions and can be
+#' @details The current beta version is limited to single-sample functions and can be
 #' used to estimate moments of distribution and bootstrap confidence intervals
 #' around them. For each dated specimen, the probability age distribution (e.g.,
 #' Bayesian calibration of an radiocarbon age) must be provided.
