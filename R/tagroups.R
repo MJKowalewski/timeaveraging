@@ -1,7 +1,7 @@
 #' By-group analysis of age distributions
 #'
 #' Returns Monte Carlo approximations, moments of age distributions,
-#' and bootstrap confidence intervals for data grouped by samples.
+#' and bootstrap confidence intervals for data grouped into samples.
 #' Dispersion estimates are adjusted for excess variances produced by dating
 #' uncertainty. Uses functions \code{\link{postdist}}, \code{\link{tastats}},
 #' and \code{\link{tastats.boot}}
