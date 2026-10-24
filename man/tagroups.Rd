@@ -37,7 +37,7 @@ a list with five items:
 \description{
 Returns Monte Carlo approximations, moments of age distributions,
 and bootstrap confidence intervals for data grouped by samples.
-Dispersion estimates adjusted for excess variances produced by dating
+Dispersion estimates are adjusted for excess variances produced by dating
 uncertainty. Uses functions \code{\link{postdist}}, \code{\link{tastats}},
 and \code{\link{tastats.boot}}
 }
