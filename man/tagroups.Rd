@@ -22,7 +22,7 @@ specimens into subsets (specimen dataset).}
 used in \code{\link{postdist}}}
 }
 \value{
-a list with six items:
+a list with five items:
   \item{mcdist}{returns a list (with length n = number of groups) of
   data.frames with Monte Carlo approximations (see \code{\link{postdist}})
   for each group.}
@@ -37,7 +37,7 @@ a list with six items:
 \description{
 Returns Monte Carlo approximations, moments of age distributions,
 and bootstrap confidence intervals for data grouped by samples.
-diseprsion estimates adjusted for excess variances produced by dating
+Dispersion estimates adjusted for excess variances produced by dating
 uncertainty. Uses functions \code{\link{postdist}}, \code{\link{tastats}},
 and \code{\link{tastats.boot}}
 }
