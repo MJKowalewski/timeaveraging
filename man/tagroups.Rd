@@ -2,7 +2,7 @@
 % Please edit documentation in R/tagroups.R
 \name{tagroups}
 \alias{tagroups}
-\title{By-group analysis of age distributions}
+\title{Analysis of age distributions grouped by samples}
 \usage{
 tagroups(group, id, mcid, mcprob, mcage, size = 1000)
 }

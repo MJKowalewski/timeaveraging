@@ -1,4 +1,4 @@
-#' By-group analysis of age distributions
+#' Analysis of age distributions grouped by samples
 #'
 #' Returns Monte Carlo approximations, moments of age distributions,
 #' and bootstrap confidence intervals for data grouped into samples.
