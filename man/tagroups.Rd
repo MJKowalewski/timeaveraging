@@ -26,8 +26,9 @@ a list with five items:
   \item{mcdist}{returns a list (with length n = number of groups) of
   data.frames with Monte Carlo approximations (see \code{\link{postdist}})
   for each group.}
-  \item{tasummary}{returns a list (with length n = number of groups) of
-  data.frames with statistics (see \code{\link{tastats}}) for each group.}
+  \item{tasummary}{returns a dataframe (with number rows equal to
+  n = number of groups) with statistics (see \code{\link{tastats}})
+  for each group.}
   \item{taboot}{returns a list (with length n = number of groups) of
   data.frames with bootstrap confidence intervals for each group
   (see \code{\link{tastats.boot}})}

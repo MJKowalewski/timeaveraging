@@ -30,8 +30,9 @@
 #'   \item{mcdist}{returns a list (with length n = number of groups) of
 #'   data.frames with Monte Carlo approximations (see \code{\link{postdist}})
 #'   for each group.}
-#'   \item{tasummary}{returns a list (with length n = number of groups) of
-#'   data.frames with statistics (see \code{\link{tastats}}) for each group.}
+#'   \item{tasummary}{returns a dataframe (with number rows equal to
+#'   n = number of groups) with statistics (see \code{\link{tastats}})
+#'   for each group.}
 #'   \item{taboot}{returns a list (with length n = number of groups) of
 #'   data.frames with bootstrap confidence intervals for each group
 #'   (see \code{\link{tastats.boot}})}
@@ -68,8 +69,9 @@ tagroups <- function(group, id, mcid, mcprob, mcage, size=1000) {
                                                 id=x$id, size=size))
   names(out1) <- unique(group)
   out2 <- lapply(out1, tastats)
+  out2df <- as.data.frame(do.call(rbind, out2))
   out3 <- lapply(out1, tastats.boot)
-  return(list(mcdist=out1, tasummary=out2, taboot=out3,
+  return(list(mcdist=out1, tasummary=out2df, taboot=out3,
               number.groups=ngp, group.names=unique(group), iterations=size))
 }
 
