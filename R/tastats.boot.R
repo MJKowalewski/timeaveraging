@@ -13,12 +13,14 @@
 #' Estimated Time-Averaging  corrected for dating uncertainty.
 #' calculated as 2 * square root of TAV-AEV (see Ritter et al. 2023)
 #'
-#' IQR - bootstrap estimate IQR corrected for dating uncertainty computed
+#' IQR - bootstrap estimate of IQR corrected for dating uncertainty computed
 #' as ETA/2 multiplied by iq.age/std.age (see Tomasovych et al. 2023)
 #'
 #' L2 - bootstrap estimate of L-dispersion calculated using
 #' function \code{\link[lmom]{samlmu}} from package "lmom".
 #' NOTE: L2 is not adjusted for dating uncertainty.
+#'
+#' G1 - bootstrap estimate of parametric sample skewness
 #'
 #' L3 - bootstrap estimate of L-skewness calculated using
 #' function \code{\link[lmom]{samlmu}} from package "lmom".
@@ -98,6 +100,16 @@ tastats.boot <- function(x, iter=1000, conf=0.95) {
                            L2.lower=ci.out.L2$bca[4],
                            L2.upper=ci.out.L2$bca[5])
   rownames(ci.out2.L2) <- NULL
+  # G1
+  G1F <- function(x) (sum((x-mean(x))^3)/length(x)) / stats::var(x)^(3/2)
+  G1.boot.F <- function(x, w) G1F(apply(x[w,], 1, median))
+  boot.out.G1 <- boot::boot(x, G1.boot.F, R=iter)
+  ci.out.G1 <- suppressWarnings(boot::boot.ci(boot.out.G1,
+                                              type='bca', conf=conf))
+  ci.out2.G1 <- data.frame(G1=ci.out.G1$t0,
+                           G1.lower=ci.out.G1$bca[4],
+                           G1.upper=ci.out.G1$bca[5])
+  rownames(ci.out2.G1) <- NULL
 
   # L3
       l3F <- function(x) as.numeric(lmom::samlmu(x)[3])
@@ -108,5 +120,5 @@ tastats.boot <- function(x, iter=1000, conf=0.95) {
                             L3.lower=ci.out.L3$bca[4],
                             L3.upper=ci.out.L3$bca[5])
       rownames(ci.out2.L3) <- NULL
-    return(cbind(ci.out2, ci.out2.L2, ci.out2.L3))
+    return(cbind(ci.out2, ci.out2.L2, ci.out2.G1, ci.out2.L3))
 }

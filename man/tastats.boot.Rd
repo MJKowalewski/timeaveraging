@@ -37,12 +37,14 @@ ETA - bootstrap estimate of confidence intervals for
 Estimated Time-Averaging  corrected for dating uncertainty.
 calculated as 2 * square root of TAV-AEV (see Ritter et al. 2023)
 
-IQR - bootstrap estimate IQR corrected for dating uncertainty computed
+IQR - bootstrap estimate of IQR corrected for dating uncertainty computed
 as ETA/2 multiplied by iq.age/std.age (see Tomasovych et al. 2023)
 
 L2 - bootstrap estimate of L-dispersion calculated using
 function \code{\link[lmom]{samlmu}} from package "lmom".
 NOTE: L2 is not adjusted for dating uncertainty.
+
+G1 - bootstrap estimate of parametric sample skewness
 
 L3 - bootstrap estimate of L-skewness calculated using
 function \code{\link[lmom]{samlmu}} from package "lmom".
