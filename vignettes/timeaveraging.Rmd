@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 **INTRODUCTION**
 
-Package *timeaveraging* assembles functions for analyzing age distribution of individually dated fossil specimens. The package is designed for datasets that include posterior-calibrated ages (typically Bayesian-calibrated radiocarbon or amino-acid racemization dates). Package includes example datasets are included.
+Package *timeaveraging* assembles functions for analyzing age distribution of individually dated fossil specimens. The package is designed for datasets that include posterior-calibrated ages (typically Bayesian-calibrated radiocarbon or amino-acid racemization dates). Inlcudes two example datasets.
 
 The current version of the package time-averaging can be downloaded from Github.
 
@@ -39,11 +39,14 @@ library(timeaveraging)
 
 *tastats.boot* - computes sample-level bootstrap estimates for selected sample-level statistics
 
+*tagroups* - Applicable when data includes multiple groups (samples). Calls internally functions postdist, tastats, and tastats.boot and returns sample-level estimates of dispersion (ETA, ETA50, L2) and skewness (L3) parameters separately for each sample.
+
+
 **DATASETS**
 
-*bahamas* - A dataset including radiocarbon ages for 30 mollusk shells and 30 echinoid tests from one sampling site off the coast of San Salvador, Bahamas. Data from Kowalewski et al. (2018).
+*bahamas* - A list with two items: (1) radiocarbon ages for 30 mollusk shells and 30 echinoid tests from one sampling site off the coast of San Salvador, Bahamas; and (2) posterior probabilities for each dated specimens. Data from Kowalewski et al. (2018).
 
-*florida* - An unpublished dataset of radiocarbon ages for mollusk shells, echinoid tests, mollusk fragments, and echinoid samples from Cedar Key, Florida.
+*florida* - A list with two items (1) radiocarbon ages for mollusk shells, echinoid tests, mollusk fragments, and echinoid samples from Cedar Key, Florida; and (2) posterior probabilities for each dated specimen. Data from an unpublished dataset reported in (Grimmelbein et al. 2025).
 
 
 
@@ -53,8 +56,7 @@ library(timeaveraging)
 
 The function *postdist* generates specimen-level Monte Carlo distributions of age estimates for each dated specimen based on Bayesian posterior probability distribution. Returns aN object of class 'postdist'.
 
-NOTE: Radiocarbon (or other) calibration provides posterior probabilities of age values given the observed uncalibrated ages. The function *postdist* generates a Monte Carlo approximation of posterior probability distribution converting probabilities into a predefined number of age values representing age uncertainty around a given date. If age bins are not annual, the function 
-adjusts probabilities to yearly resolution and ensures they sum up to 1.
+NOTE: Radiocarbon (or other) calibration provides posterior probabilities of age values given the observed uncalibrated ages. The function *postdist* generates a Monte Carlo approximation of posterior probability distributions converting probabilities into a predefined number of age values representing age uncertainty around a given date. If age bins are not annual, the function adjusts probabilities to yearly resolution and ensures they sum up to 1.
 
 Arguments:
 
@@ -86,19 +88,19 @@ The function returns the following summary statistics:
 
 *mean.age* - mean age of a sample calculated from mean or median ages of posterior distributions of individual ages.
 
-*std.age* - standard deviation of a sample calculated from mean or median ages of posterior distributions of individual ages.
+*STD2* - two standard deviations of a sample calculated from mean or median ages of posterior distributions of individual ages.
 
-*iq.age* - interquartile range calculated from mean or median ages of posterior distributions of individual ages.
+*IQR* - interquartile range calculated from mean or median ages of posterior distributions of individual ages.
 
-*AEV* - Age Estimation Variance calculated as average of variances of posterior Monte-Carlo distributions of individual ages included in a sample (see Ritter et al. 2023)
+*ETA2SD* - Estimated Time-Averaging (2 standard deviations) corrected for dating uncertainty calculated as 2 * square root of TAV-AEV (see Ritter et al. 2023)
 
-*TAV* - Total Assemblage Variance calculated as variance of all Monte-Carlo ages (see Ritter et al. 2023)
+*ETA50* - Estimated IQR corrected for dating uncertainty computed as ETA/2 multiplied by iq.age/std.age (see Tomasovych et al. 2023)
 
-*ETA* - Estimated Time-Averaging (2 standard deviations) corrected for dating uncertainty calculated as 2 * square root of TAV-AEV (see Ritter et al. 2023)
+*L2* - L-dispersion calculated from mean or median ages of posterior distributions using function {samlmu} from package "lmom". NOTE: This estimate is not corrected for dating uncertainty.
 
-*g1* - skewness, the third moment about the mean calculated from mean or median ages of posterior distributions.
+*G1* - skewness, the third moment about the mean calculated from mean or median ages of posterior distributions.
 
-*l3* - L-skeweness calculated using function *samlmu* from the package *lmom* (Hosking 2024).
+*L3* - L-skeweness calculated using function *samlmu* from the package *lmom* (Hosking 2024).
 
 Arguments:
 
@@ -110,7 +112,7 @@ Arguments:
 
 Values:
 
-NOTE: The function *tastats* return a dataframe with sample-level statistics (if simple=T) or a list with five items (if simple=F).
+NOTE: The function *tastats* return a dataframe with sample-level statistics (if simple=TRUE) or a list with five items (if simple=FALSE).
 
 *my.stats* - a dataframe (if simple = T) or the first item in the list of items (if simple = F). This is a single set of numerical values providing summary statistics for a given sample.
 
@@ -135,8 +137,7 @@ hist(out3$ages, main='', xlab='calibrated age [BP]', ylab='number of specimens')
 ```
 
 *Comments*
-It is advisable to check if Monte Carlo estimates agree with the reported median
-ages (if provided in the specimen dataset)
+It is advisable to check if Monte Carlo estimates agree with the reported median ages (if provided in the specimen dataset)
 
 ```{r}
 out1 <- postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
@@ -158,13 +159,14 @@ plot(bout$age, bout$agemc, ylab='Monte Carlo estimate', xlab='reported calibrate
 Returns sample-level equi-tailed two-sided bootstrap confidence intervals for time-averaging statistics. Accepts object of the class 'postidst' generated by function 'postdist'. Calculates accelerated-bias-corrected non-parametric bootstrap confidence intervals for each sample of dated specimens using package 'boot'.
 
 Currently, the following statistics can be returned:
-ETA - bootstrap estimate of confidence intervals for Estimated Time-Averaging  corrected for dating uncertainty calculated as 2 * square root of TAV-AEV (see Ritter et al. 2023)
+
+ETA - bootstrap estimate of confidence intervals for Estimated Time-Averaging corrected for dating uncertainty. calculated as 2 * square root of TAV-AEV (see Ritter et al. 2023)
 
 IQR - bootstrap estimate IQR corrected for dating uncertainty computed as ETA/2 multiplied by iq.age/std.age (see Tomasovych et al. 2023)
 
-g1 - bootstrap estimate of skewness, the third moment about the mean calculated from mean or median ages of posterior distributions
+L2 - bootstrap estimate of L-dispersion calculated using function samlmu \code{\link[lmom]{samlmu}} from package "lmom". NOTE: L2 is not adjusted for dating uncertainty.
 
-l3 - bootstrap estimate of L-skeweness calculated using function \code{\link[lmom]{samlmu}} from package "lmom".
+L3 - bootstrap estimate of L-skewness calculated using function samlmu from package "lmom".
 
 Return A dataframe with the sample estimate of the statistic ('ETA/IQR' or 'l3) and sample-level bootstrap confidence.
 

@@ -18,7 +18,7 @@
 #'
 #' L2 - bootstrap estimate of L-dispersion calculated using
 #' function \code{\link[lmom]{samlmu}} from package "lmom".
-#' NOTE: L3 is not adjusted for dating uncertainty.
+#' NOTE: L2 is not adjusted for dating uncertainty.
 #'
 #' L3 - bootstrap estimate of L-skewness calculated using
 #' function \code{\link[lmom]{samlmu}} from package "lmom".

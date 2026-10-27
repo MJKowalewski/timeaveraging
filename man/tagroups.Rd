@@ -57,6 +57,6 @@ mcage=bahamas$post$Age)
 
 res1$tasummary
 
-res1$tasummary
+res1$taboot
 
 }

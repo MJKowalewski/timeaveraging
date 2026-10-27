@@ -42,7 +42,7 @@ as ETA/2 multiplied by iq.age/std.age (see Tomasovych et al. 2023)
 
 L2 - bootstrap estimate of L-dispersion calculated using
 function \code{\link[lmom]{samlmu}} from package "lmom".
-NOTE: L3 is not adjusted for dating uncertainty.
+NOTE: L2 is not adjusted for dating uncertainty.
 
 L3 - bootstrap estimate of L-skewness calculated using
 function \code{\link[lmom]{samlmu}} from package "lmom".

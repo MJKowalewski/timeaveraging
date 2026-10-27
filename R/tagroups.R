@@ -47,7 +47,7 @@
 #'
 #' res1$tasummary
 #'
-#' res1$tasummary
+#' res1$taboot
 #'
 #' @importFrom boot boot boot.ci
 #' @importFrom lmom samlmu
