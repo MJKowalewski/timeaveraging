@@ -27,15 +27,15 @@
 #' used in \code{\link{postdist}}
 #'
 #' @return a list with five items:
-#'   \item{mcdist}{returns a list (with length n = number of groups) of
-#'   data.frames with Monte Carlo approximations (see \code{\link{postdist}})
+#'   \item{mcdist}{returns a list (length n = number of groups) of
+#'   Monte Carlo approximations (see \code{\link{postdist}})
 #'   for each group.}
-#'   \item{tasummary}{returns a dataframe (with number rows equal to
+#'   \item{tasummary}{returns a data.frame (with number rows equal to
 #'   n = number of groups) with statistics (see \code{\link{tastats}})
 #'   for each group.}
-#'   \item{taboot}{returns a list (with length n = number of groups) of
-#'   data.frames with bootstrap confidence intervals for each group
-#'   (see \code{\link{tastats.boot}})}
+#'   \item{taboot}{returns a data.frame (with nrow = number of groups) of
+#'   parameter estimates and bootstrap confidence intervals for ETA, ETA50,
+#'   L2, and L3}
 #'   \item{number.groups}{the integer indicating number of groups}
 #'   \item{iterations}{the integer indicating number of replications}
 #'
@@ -45,7 +45,9 @@
 #' mcid=bahamas$post$Specimen, mcprob=bahamas$post$Probability,
 #' mcage=bahamas$post$Age)
 #'
-#' str(res1)
+#' res1$tasummary
+#'
+#' res1$tasummary
 #'
 #' @importFrom boot boot boot.ci
 #' @importFrom lmom samlmu
@@ -68,10 +70,11 @@ tagroups <- function(group, id, mcid, mcprob, mcage, size=1000) {
   out1 <- lapply(group.list, function(x) postdist(age=x$age, prob=x$prob,
                                                 id=x$id, size=size))
   names(out1) <- unique(group)
+  class(out1) <- "postdist"
   out2 <- lapply(out1, tastats)
   out2df <- as.data.frame(do.call(rbind, out2))
-  out3 <- lapply(out1, tastats.boot)
-  return(list(mcdist=out1, tasummary=out2df, taboot=out3,
+  out3 <- sapply(out1, tastats.boot)
+  return(list(mcdist=out1, tasummary=out2df, taboot=as.data.frame(t(out3)),
               number.groups=ngp, group.names=unique(group), iterations=size))
 }
 
