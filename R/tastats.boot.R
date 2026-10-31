@@ -80,7 +80,7 @@ tastats.boot <- function(x, iter=1000, conf=0.95) {
   # ETA and ETA 50
   ETA.boot.F <- function(x, w)
     2*sqrt(var(as.vector(x[w,])) - mean(apply(x[w,], 1, var)))
-  boot.out <- boot::boot(x, ETA.boot.F, R=iter)
+  boot.out <- suppressWarnings(boot::boot(x, ETA.boot.F, R=iter))
   ci.out <- suppressWarnings(boot::boot.ci(boot.out, type='bca', conf=conf))
   corr.IQR <- stats::IQR(apply(x, 1, median))/sd(apply(x, 1, median))
   ci.out2 <- data.frame(ETA=ci.out$t0,
@@ -120,5 +120,5 @@ tastats.boot <- function(x, iter=1000, conf=0.95) {
                             L3.lower=ci.out.L3$bca[4],
                             L3.upper=ci.out.L3$bca[5])
       rownames(ci.out2.L3) <- NULL
-    return(cbind(ci.out2, ci.out2.L2, ci.out2.G1, ci.out2.L3))
+    return(data.frame(ci.out2, ci.out2.L2, ci.out2.G1, ci.out2.L3))
 }

@@ -73,8 +73,8 @@ tagroups <- function(group, id, mcid, mcprob, mcage, size=1000) {
   class(out1) <- "postdist"
   out2 <- lapply(out1, tastats)
   out2df <- as.data.frame(do.call(rbind, out2))
-  out3 <- sapply(out1, tastats.boot)
-  return(list(mcdist=out1, tasummary=out2df, taboot=as.data.frame(t(out3)),
+  out3 <- lapply(out1, tastats.boot)
+  return(list(mcdist=out1, tasummary=out2df, taboot=do.call(rbind, out3),
               number.groups=ngp, group.names=unique(group), iterations=size))
 }
 
