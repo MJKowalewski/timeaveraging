@@ -4,14 +4,10 @@ export(postdist)
 export(tagroups)
 export(tastats)
 export(tastats.boot)
-importFrom(boot,
-  boot,
-  boot.ci
-)
+importFrom(boot,boot)
+importFrom(boot,boot.ci)
 importFrom(lmom,samlmu)
-importFrom(stats,
-  IQR,
-  median,
-  sd,
-  var
-)
+importFrom(stats,IQR)
+importFrom(stats,median)
+importFrom(stats,sd)
+importFrom(stats,var)
