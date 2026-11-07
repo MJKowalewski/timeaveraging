@@ -3,7 +3,11 @@ Type: Package
 Title: Time-Averaging Package for Paleontologists
 Version: 0.1.0
 Depends: R (>= 4.0.0)
-Imports: boot, lmom (>= 3.0), stats
+Imports: 
+    boot,
+    lmom (>= 3.0),
+    MASS,
+    stats
 Date: 2024-08-12
 Authors@R: c(
     person("Michał", "Kowalewski", email = "kowalewski@ufl.edu", role = c("aut", "cre")),
@@ -20,7 +24,6 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/mjkowalewski/timeaveraging
 BugReports: https://github.com/mjkowalewski/timeaveraging
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, roxygen2 (>= 8.0.0)
 VignetteBuilder: knitr
-Config/roxygen2/version: 8.1.1
-RoxygenNote: 7.3.2
+Config/roxygen2/version: 8.1.0

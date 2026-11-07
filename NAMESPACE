@@ -2,12 +2,25 @@
 
 export(postdist)
 export(tagroups)
+export(tamodels)
 export(tastats)
 export(tastats.boot)
-importFrom(boot,boot)
-importFrom(boot,boot.ci)
+importFrom(MASS,fitdistr)
+importFrom(boot,
+  boot,
+  boot.ci
+)
 importFrom(lmom,samlmu)
-importFrom(stats,IQR)
-importFrom(stats,median)
-importFrom(stats,sd)
-importFrom(stats,var)
+importFrom(stats,
+  AIC,
+  BIC,
+  IQR,
+  median,
+  quantile,
+  rexp,
+  rnorm,
+  runif,
+  rweibull,
+  sd,
+  var
+)
