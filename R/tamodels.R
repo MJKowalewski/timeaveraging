@@ -8,29 +8,30 @@
 #' @details An age distribution of a sample of dated specimens is evaluated
 #' in terms of their fit to the four theoretical distributions using maximum likelihood.
 #' The incompleteness of a sample is estimated as the proportion of bins
-#' (equispaced time intervals) containing specimens. The incompleteness estimates
+#' (time intervals) containing specimens. The incompleteness estimates
 #' are compared against predictions of the Monte Carlo models for
 #' four theoretical distributions (uniform, normal, exponential, and Weibull).
 #'
 #' @param x A vector with numerical ages of dated specimens.
-#' Note: if negative ages occur, the constant (-min(age) + 1) is added
+#' Note: if negative ages are included, the constant (-min(age) + 1) is added
 #' to all age values with a warning
 #'
-#' @param times A numerical value defining number of iterations for Monte Carlo models
+#' @param times A numerical value (number of iterations to be
+#' used in Monte Carlo models)
 #'
 #' @param t A numerical value defining bin width in years
 #'
 #' @return A list with five items:
 #'   \item{models}{a data frame with AIC and BIC
 #'   information criteria for each model}
-#'   \item{estimate}{observed completeness of a sample for a given **t**}
+#'   \item{estimate}{observed completeness of a sample for a given \emph{t}}
 #'   \item{monte.carlo}{a data frame with Monte Carlo estimates of
-#'   the significance of observed incompleteness (**p**), incompleteness
-#'   predicted by each model (**predicted**), including the lower (**Ci.lower**)
-#'   and upper (**CI.upper**) 95% confidence intervals, and the observed
-#'   completeness (**observed**)}
+#'   the significance of observed incompleteness \emph{p}, incompleteness
+#'   predicted by each model \emph{predicted}, including the lower \emph{Ci.lower}
+#'   and upper\emph{CI.upper} 95% confidence intervals, and the observed
+#'   completeness \emph{observed}}
 #'   \item{iterations}{number of iterations in Monte Carlo models}
-#'   \item{time.bin}{the time bin **t**}
+#'   \item{time.bin}{the time bin \emph{t}}
 #'
 #' @examples
 #'
@@ -58,7 +59,7 @@ tamodels <- function(x, times=1000, t = 100) {
     range <- max(bins) - min(bins) + 1
     k <- length(unique(bins))
     return(k/range)
-    }
+  }
   obs.comp <- comp.F(x, t = t)
   n.obs <- length(x)
   fit.exp <- MASS::fitdistr(x, "exponential")
@@ -80,14 +81,18 @@ tamodels <- function(x, times=1000, t = 100) {
                   BIC=c(uniform = bic.unif, normal = bic.nor,
                         exponential = bic.exp, weibull = bic.wei))
   rcomp.unif <- vector(mode='numeric', length=times)
-  for (i in 1:times) rcomp.unif[i] <- comp.F(stats::runif(n.obs, min(x), max(x)), t=t)
+  for (i in 1:times)
+    rcomp.unif[i] <- comp.F(stats::runif(n.obs, min(x), max(x)), t=t)
   rcomp.nor <- vector(mode='numeric', length=times)
-  for (i in 1:times) rcomp.nor[i] <- comp.F(stats::rnorm(n.obs, fit.nor$estimate["mean"],
-                                                         fit.nor$estimate["sd"]), t=t)
+  for (i in 1:times)
+    rcomp.nor[i] <- comp.F(stats::rnorm(n.obs, fit.nor$estimate["mean"],
+                                        fit.nor$estimate["sd"]), t = t)
   rcomp.exp <- vector(mode='numeric', length=times)
-  for (i in 1:times) rcomp.exp[i] <- comp.F(stats::rexp(n.obs, rate=fit.exp$estimate["rate"]), t=t)
+  for (i in 1:times)
+    rcomp.exp[i] <- comp.F(stats::rexp(n.obs, rate=fit.exp$estimate["rate"]), t=t)
   rcomp.wei <- vector(mode='numeric', length=times)
-  for (i in 1:times) rcomp.wei[i] <- comp.F(stats::rweibull(n.obs, shape=fit.wei$estimate["shape"],
+  for (i in 1:times)
+    rcomp.wei[i] <- comp.F(stats::rweibull(n.obs, shape=fit.wei$estimate["shape"],
                                                scale=fit.wei$estimate["scale"]), t=t)
   monte.carlo <- rbind(uniform=data.frame(p = (sum(rcomp.unif[-1] <= obs.comp) + 1)/times,
                                    predicted = mean(rcomp.unif),
@@ -112,3 +117,4 @@ tamodels <- function(x, times=1000, t = 100) {
   return(list(models = models, estimate=obs.comp, monte.carlo = monte.carlo, iterations = times,
               time.bin = t))
 }
+
