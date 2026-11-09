@@ -25,13 +25,13 @@
 #'   \item{models}{a data frame with AIC and BIC
 #'   information criteria for each model}
 #'   \item{estimate}{observed completeness of a sample for a given \emph{t}}
-#'   \item{monte.carlo}{a data frame with Monte Carlo estimates of
-#'   the significance of observed incompleteness \emph{p}, incompleteness
-#'   predicted by each model \emph{predicted}, including the lower \emph{Ci.lower}
-#'   and upper\emph{CI.upper} 95% confidence intervals, and the observed
-#'   completeness \emph{observed}}
+#'   \item{monte.carlo}{a data frame with Monte Carlo sample-level estimates of
+#'   the significance of observed incompleteness (\emph{p}), incompleteness
+#'   predicted by each model (\emph{predicted}), including the lower (\emph{Ci.lower})
+#'   and upper (\emph{CI.upper}) 95\% confidence intervals, and the observed
+#'   completeness (\emph{observed})}
 #'   \item{iterations}{number of iterations in Monte Carlo models}
-#'   \item{time.bin}{the time bin \emph{t}}
+#'   \item{time.bin}{the time bin (\emph{t})}
 #'
 #' @examples
 #'

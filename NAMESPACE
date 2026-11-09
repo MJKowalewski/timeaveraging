@@ -2,6 +2,7 @@
 
 export(postdist)
 export(tagroups)
+export(tamodelgroups)
 export(tamodels)
 export(tastats)
 export(tastats.boot)

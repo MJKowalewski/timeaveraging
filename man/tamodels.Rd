@@ -8,10 +8,11 @@ tamodels(x, times = 1000, t = 100)
 }
 \arguments{
 \item{x}{A vector with numerical ages of dated specimens.
-Note: if negative ages occur, the constant (-min(age) + 1) is added
+Note: if negative ages are included, the constant (-min(age) + 1) is added
 to all age values with a warning}
 
-\item{times}{A numerical value defining number of iterations for Monte Carlo models}
+\item{times}{A numerical value (number of iterations to be
+used in Monte Carlo models)}
 
 \item{t}{A numerical value defining bin width in years}
 }
@@ -19,14 +20,14 @@ to all age values with a warning}
 A list with five items:
   \item{models}{a data frame with AIC and BIC
   information criteria for each model}
-  \item{estimate}{observed completeness of a sample for a given **t**}
-  \item{monte.carlo}{a data frame with Monte Carlo estimates of
-  the significance of observed incompleteness (**p**), incompleteness
-  predicted by each model (**predicted**), including the lower (**Ci.lower**)
-  and upper (**CI.upper**) 95% confidence intervals, and the observed
-  completeness (**observed**)}
+  \item{estimate}{observed completeness of a sample for a given \emph{t}}
+  \item{monte.carlo}{a data frame with Monte Carlo sample-level estimates of
+  the significance of observed incompleteness (\emph{p}), incompleteness
+  predicted by each model (\emph{predicted}), including the lower (\emph{Ci.lower})
+  and upper (\emph{CI.upper}) 95\% confidence intervals, and the observed
+  completeness (\emph{observed})}
   \item{iterations}{number of iterations in Monte Carlo models}
-  \item{time.bin}{the time bin **t**}
+  \item{time.bin}{the time bin (\emph{t})}
 }
 \description{
 Fit theoretical distributions (uniform, normal, exponential, and Weibull)
@@ -38,7 +39,7 @@ models for uniform, normal, exponential and Weibull distributions.
 An age distribution of a sample of dated specimens is evaluated
 in terms of their fit to the four theoretical distributions using maximum likelihood.
 The incompleteness of a sample is estimated as the proportion of bins
-(equispaced time intervals) containing specimens. The incompleteness estimates
+(time intervals) containing specimens. The incompleteness estimates
 are compared against predictions of the Monte Carlo models for
 four theoretical distributions (uniform, normal, exponential, and Weibull).
 }

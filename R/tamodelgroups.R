@@ -1,4 +1,52 @@
-tamodels.gp <- function(x, times=1000, t=100) {
+#' Fit theoretical distribution and assess the temporal incompleteness of multiple sample
+#'
+#' Fit theoretical distributions and assess temporal incompleteness for
+#' multiple samples of dated specimens.
+#'
+#' @details This wrapper function uses function \code{\link{tamodels}}
+#' to evaluate multiple samples (multiple age distributions of dated specimens)
+#' in terms of their fit to theoretical distributions and their temporal incompleteness.
+#'
+#' @param x A list of vectors of numerical ages of dated specimens.
+#' Note: if negative ages are included, the constant (-min(age) + 1) is added
+#' to all age values with a warning
+#'
+#' @param times A numerical value (number of iterations to be
+#' used in Monte Carlo models)
+#'
+#' @param t A numerical value defining bin width in years
+#'
+#' @return A list with five items:
+#'   \item{AIC}{a data frame with AIC values for each sample}
+#'   \item{BIC}{a data frame with BIC values for each sample}
+#'   \item{estimate}{observed completeness of each sample at a given time bin  \emph{t}}
+#'   \item{monte.carlo}{a data frame with Monte Carlo estimates of
+#'   the significance of observed incompleteness (\emph{p}), the theoretical
+#'   distribution selected using AIC (\emph{model}), incompleteness
+#'   predicted by each model (\emph{predicted}), including the lower (\emph{Ci.lower})
+#'   and upper (\emph{CI.upper}) 95\% confidence intervals, the observed
+#'   completeness (\emph{observed})}
+#'   \item{iterations}{number of iterations in Monte Carlo models}
+#'   \item{time.bin}{the time bin (\emph{t})}
+#'
+#' @examples
+#'
+#' out1 <- postdist(age=florida$post$cal.BP, prob=florida$post$probability,
+#' id=florida$post$UniqueID, size=10000)
+#'
+#' out2 <- postdist(age=bahamas$post$Age, prob=bahamas$post$Probability,
+#' id=bahamas$post$Specimen, size=10000)
+#'
+#' samples <- list(florida=apply(out1, 1, median), bahamas=apply(out2, 1, median))
+#'
+#' results <- tamodelgroups(samples)
+#'
+#' @importFrom stats quantile runif rexp rweibull rnorm AIC BIC
+#' @importFrom MASS fitdistr
+#'
+#' @export
+
+tamodelgroups <- function(x, times=1000, t=100) {
   out <- lapply(x, tamodels, times=times, t=t)
   sam.est <- sapply(out, `[[`, 'estimate')
   models <- do.call(rbind, lapply(out, `[[`, 'models'))
@@ -25,20 +73,11 @@ tamodels.gp <- function(x, times=1000, t=100) {
   mc.estimates$AIC <- as.numeric(mc.estimates$model == mc.estimates$AICn)
   mc.estimates$BIC <- as.numeric(mc.estimates$model == mc.estimates$BICn)
   mc.prefinal <- mc.estimates[ , !(colnames(mc.estimates) %in% c('AICn', 'BICn'))]
-  mc.final <- mc.prefinal[which(mc.prefinal$AIC == 1 | mc.prefinal$BIC == 1), ]
+  mc.final <- mc.prefinal[which(mc.prefinal$AIC == 1), ]
   return(list(AIC = models.AIC,
               BIC = models.BIC,
-              completness=sam.est,
-              MC = mc.final,
+              estimate=sam.est,
+              monte.carlo = mc.final,
               iterations = out[[1]]$iterations,
               time.bin = out[[1]]$time.bin))
 }
-res1 <- tagroups(group=bahamas$spec$taxon, id=bahamas$spec$sample,
-                 mcid=bahamas$post$Specimen, mcprob=bahamas$post$Probability,
-                 mcage=bahamas$post$Age)
-out1 <- lapply(res1$mcdist, function(x) apply(x, 1, median))
-tamodels.gp(out1, t=50)
-
-a <- NULL
-a <- rnorm(50, 2000, 30)
-tamodelgroups(out1)
