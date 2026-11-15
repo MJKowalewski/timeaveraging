@@ -26,4 +26,4 @@ URL: https://github.com/mjkowalewski/timeaveraging
 BugReports: https://github.com/mjkowalewski/timeaveraging
 Suggests: knitr, rmarkdown, roxygen2 (>= 8.0.0)
 VignetteBuilder: knitr
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1

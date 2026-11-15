@@ -54,6 +54,8 @@
 tamodels <- function(x, times=1000, t = 100) {
   if (min(x) < 0) warning(paste('negative ages (BP?) converted by adding', paste(-min(x)+1), 'years'))
   if (min(x) < 0) x <- x - min(x) + 1
+  n.obs <- length(x)
+  # completeness function
   comp.F <- function(y, t = t) {
     bins <- floor(y/t)
     range <- max(bins) - min(bins) + 1
@@ -61,12 +63,11 @@ tamodels <- function(x, times=1000, t = 100) {
     return(k/range)
   }
   obs.comp <- comp.F(x, t = t)
-  n.obs <- length(x)
+  # Fit models
   fit.exp <- MASS::fitdistr(x, "exponential")
   fit.nor <- MASS::fitdistr(x, "normal")
-  fit.wei <- MASS::fitdistr(x, densfun="weibull",
-                      start=list(shape = 1, scale = mean(x)),
-                      lower=c(0.001, 0.001))
+  fit.wei <- MASS::fitdistr(x, densfun="weibull", start=list(shape = 1, scale = mean(x)),
+                     lower=c(0.001, 0.001))
   aic.exp <- stats::AIC(fit.exp)
   bic.exp <- stats::BIC(fit.exp)
   aic.nor <- stats::AIC(fit.nor)
@@ -80,20 +81,26 @@ tamodels <- function(x, times=1000, t = 100) {
                         exponential = aic.exp, weibull = aic.wei),
                   BIC=c(uniform = bic.unif, normal = bic.nor,
                         exponential = bic.exp, weibull = bic.wei))
+  # MC uniform
   rcomp.unif <- vector(mode='numeric', length=times)
   for (i in 1:times)
     rcomp.unif[i] <- comp.F(stats::runif(n.obs, min(x), max(x)), t=t)
+  # MC normal
   rcomp.nor <- vector(mode='numeric', length=times)
   for (i in 1:times)
     rcomp.nor[i] <- comp.F(stats::rnorm(n.obs, fit.nor$estimate["mean"],
                                         fit.nor$estimate["sd"]), t = t)
+  # MC exponential
   rcomp.exp <- vector(mode='numeric', length=times)
   for (i in 1:times)
-    rcomp.exp[i] <- comp.F(stats::rexp(n.obs, rate=fit.exp$estimate["rate"]), t=t)
+    rcomp.exp[i] <- comp.F(stats::rexp(n.obs,
+                                       rate=fit.exp$estimate["rate"]), t=t)
+  # MC weibull (uncensored)
   rcomp.wei <- vector(mode='numeric', length=times)
   for (i in 1:times)
     rcomp.wei[i] <- comp.F(stats::rweibull(n.obs, shape=fit.wei$estimate["shape"],
-                                               scale=fit.wei$estimate["scale"]), t=t)
+                                           scale=fit.wei$estimate["scale"]), t=t)
+
   monte.carlo <- rbind(uniform=data.frame(p = (sum(rcomp.unif[-1] <= obs.comp) + 1)/times,
                                    predicted = mean(rcomp.unif),
                                    CI.lower = stats::quantile(rcomp.unif, 0.025),

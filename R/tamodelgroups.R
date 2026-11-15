@@ -72,11 +72,12 @@ tamodelgroups <- function(x, times=1000, t=100) {
                              row.names=NULL)
   mc.estimates$AIC <- as.numeric(mc.estimates$model == mc.estimates$AICn)
   mc.estimates$BIC <- as.numeric(mc.estimates$model == mc.estimates$BICn)
-  mc.prefinal <- mc.estimates[ , !(colnames(mc.estimates) %in% c('AICn', 'BICn'))]
-  mc.final <- mc.prefinal[which(mc.prefinal$AIC == 1), ]
+  mc.all <- mc.estimates[ , !(colnames(mc.estimates) %in% c('AICn', 'BICn'))]
+  mc.final <- mc.all[which(mc.all$AIC == 1), ]
   return(list(AIC = models.AIC,
               BIC = models.BIC,
               estimate=sam.est,
+              monte.carlo.all=mc.all,
               monte.carlo = mc.final,
               iterations = out[[1]]$iterations,
               time.bin = out[[1]]$time.bin))
