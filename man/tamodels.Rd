@@ -20,7 +20,10 @@ used in Monte Carlo models)}
 A list with five items:
   \item{models}{a data frame with AIC and BIC
   information criteria for each model}
-  \item{estimate}{observed completeness of a sample for a given \emph{t}}
+  \item{model.param}{a list with fitted parameters for each model}
+  \item{predicted}{a data frame with predicted values for each model}
+  \item{best}{a data frame listing the best model basd on AIC and BIC}
+  \item{completeness}{observed completeness of a sample for a given \emph{t}}
   \item{monte.carlo}{a data frame with Monte Carlo sample-level estimates of
   the significance of observed incompleteness (\emph{p}), incompleteness
   predicted by each model (\emph{predicted}), including the lower (\emph{Ci.lower})

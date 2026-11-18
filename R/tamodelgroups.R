@@ -48,17 +48,21 @@
 
 tamodelgroups <- function(x, times=1000, t=100) {
   out <- lapply(x, tamodels, times=times, t=t)
-  sam.est <- sapply(out, `[[`, 'estimate')
+  sam.est <- sapply(out, `[[`, 'completeness')
   models <- do.call(rbind, lapply(out, `[[`, 'models'))
+  model.param <- do.call(rbind, lapply(out, function(x) unlist(x[['model.param']])))
+  model.predict <- simplify2array(lapply(out, function(el) as.matrix(el[['predicted']])))
+  best.predict <- lapply(model.predict,
+                         function(m) m[,grep("*", colnames(m), fixed = TRUE)])
   models.AIC <- data.frame(samples=names(x),
-                      models[rownames(models)=='AIC',],
+                      models[grep('AIC', rownames(models)),],
                       row.names=NULL)
   n.models <- ncol(models.AIC) - 1
   sel.model.AIC <- apply(models.AIC, 1, function(x) which(x == min(x)))
   best.AIC <- colnames(models.AIC)[sel.model.AIC]
   names(best.AIC) <- names(x)
   models.BIC <- data.frame(samples=names(out),
-                         models[rownames(models)=='BIC',],
+                         models[grep('BIC', rownames(models)),],
                          row.names=NULL)
   sel.model.BIC <- apply(models.BIC, 1, function(x) which(x == min(x)))
   best.BIC <- colnames(models.BIC)[sel.model.BIC]
@@ -77,6 +81,9 @@ tamodelgroups <- function(x, times=1000, t=100) {
   return(list(AIC = models.AIC,
               BIC = models.BIC,
               estimate=sam.est,
+              model.param = model.param,
+              model.predict = model.predict,
+              best.predict = best.predict,
               monte.carlo.all=mc.all,
               monte.carlo = mc.final,
               iterations = out[[1]]$iterations,
