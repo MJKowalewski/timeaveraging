@@ -58,3 +58,21 @@ two.phase.exponential <- function(x, niters=10000, a=2, b=0.001, rmean=mean(x)) 
   out$lik <- dbest
   out
 }
+
+#RANDOM GENERATION FOR THE CENSORED WEIBULL DISTRIBUTION
+rcensweibull=function(n.obs, cens.weibullrate, cens.weibullshape, time) {
+  time.steps=1:time
+  pdf.cens.weibull<-(1/((1/cens.weibullrate)*gamma(1+1/cens.weibullshape)))*exp(-(cens.weibullrate*time.steps)^cens.weibullshape)
+  app=approx(x=time.steps, y = pdf.cens.weibull, method = "linear", n=10000)
+  out=sample(app$x,n.obs,prob=app$y, replace=T)
+  return(out)
+}
+
+#RANDOM GENERATION FOR THE TWO-PHASE EXPONENTIAL DISTRIBUTION (ADAM)
+r2exp=function(n.obs, r1, r2, beta, time) {
+  time.steps=1:time
+  pdf.2.exp<-r1*exp(-r1*time.steps)*beta+r2*exp(-r2*time.steps)*(1-beta)
+  app=stats::approx(x=time.steps, y = pdf.2.exp, method = "linear", n=10000)
+  out=sample(app$x, n.obs, prob=app$y, replace=T)
+  return(out)
+}

@@ -22,7 +22,7 @@ A list with five items:
   information criteria for each model}
   \item{model.param}{a list with fitted parameters for each model}
   \item{predicted}{a data frame with predicted values for each model}
-  \item{best}{a data frame listing the best model basd on AIC and BIC}
+  \item{best}{a data frame listing the best model based on AIC and BIC}
   \item{completeness}{observed completeness of a sample for a given \emph{t}}
   \item{monte.carlo}{a data frame with Monte Carlo sample-level estimates of
   the significance of observed incompleteness (\emph{p}), incompleteness
@@ -33,18 +33,18 @@ A list with five items:
   \item{time.bin}{the time bin (\emph{t})}
 }
 \description{
-Fit theoretical distributions (uniform, normal, exponential, and Weibull)
-to a sample of dated specimens. Assess incompleteness of a sample
-for a given time bin and significance of incompleteness using Monte Carlo
-models for uniform, normal, exponential and Weibull distributions.
+Fit theoretical distributions to a sample of dated specimens and
+estimate incompleteness of a sample for a given time bin.
 }
 \details{
 An age distribution of a sample of dated specimens is evaluated
-in terms of their fit to the four theoretical distributions using maximum likelihood.
+against theoretical probability density functions using maximum likelihood.
 The incompleteness of a sample is estimated as the proportion of bins
 (time intervals) containing specimens. The incompleteness estimates
-are compared against predictions of the Monte Carlo models for
-four theoretical distributions (uniform, normal, exponential, and Weibull).
+are compared against predictions of the Monte Carlo models derived for
+theoretical distributions. The following models are included: uniform,
+normal, lognormal, exponential, Weibull (uncensored), Weibull (censored),
+and two-phase exponential.
 }
 \examples{
 

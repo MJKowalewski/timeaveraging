@@ -20,13 +20,21 @@ used in Monte Carlo models)}
 A list with five items:
   \item{AIC}{a data frame with AIC values for each sample}
   \item{BIC}{a data frame with BIC values for each sample}
-  \item{estimate}{observed completeness of each sample at a given time bin  \emph{t}}
-  \item{monte.carlo}{a data frame with Monte Carlo estimates of
-  the significance of observed incompleteness (\emph{p}), the theoretical
-  distribution selected using AIC (\emph{model}), incompleteness
-  predicted by each model (\emph{predicted}), including the lower (\emph{Ci.lower})
-  and upper (\emph{CI.upper}) 95\% confidence intervals, the observed
-  completeness (\emph{observed})}
+  \item{completeness}{observed completeness of each sample at a given time bin  \emph{t}}
+  \item{model.param}{fitted parameters for all models for each sample}
+  \item{model.predict}{a list of matrices with each matrix reporting
+  predicted values for a given sample}
+  \item{best.predict}{a list of vectors with each vector reporting
+  predicted values for the best (AIC-selected) model for a given sample}
+  \item{monte.carlo.all}{a data frame with Monte Carlo estimates of
+  the one-tailed significance of observed incompleteness (\emph{p}),
+  relative to model predictions(\emph{predicted}), incompleteness
+  predicted by each model (\emph{predicted}), including
+  the lower (\emph{Ci.lower}) and upper (\emph{CI.upper}) 95\% confidence
+  intervals, the observed completeness (\emph{observed}),
+  and \emph{AIC} and \emph{BIC} selected best models}
+  \item{monte.carlo}{a data frame with estimates limited to the best
+  model AIC-selected model}
   \item{iterations}{number of iterations in Monte Carlo models}
   \item{time.bin}{the time bin (\emph{t})}
 }

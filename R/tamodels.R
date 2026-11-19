@@ -1,16 +1,16 @@
 #' Fit theoretical distribution and assess the temporal incompleteness of a sample
 #'
-#' Fit theoretical distributions (uniform, normal, exponential, and Weibull)
-#' to a sample of dated specimens. Assess incompleteness of a sample
-#' for a given time bin and significance of incompleteness using Monte Carlo
-#' models for uniform, normal, exponential and Weibull distributions.
+#' Fit theoretical distributions to a sample of dated specimens and
+#' estimate incompleteness of a sample for a given time bin.
 #'
 #' @details An age distribution of a sample of dated specimens is evaluated
-#' in terms of their fit to the four theoretical distributions using maximum likelihood.
+#' against theoretical probability density functions using maximum likelihood.
 #' The incompleteness of a sample is estimated as the proportion of bins
 #' (time intervals) containing specimens. The incompleteness estimates
-#' are compared against predictions of the Monte Carlo models for
-#' four theoretical distributions (uniform, normal, exponential, and Weibull).
+#' are compared against predictions of the Monte Carlo models derived for
+#' theoretical distributions. The following models are included: uniform,
+#' normal, lognormal, exponential, Weibull (uncensored), Weibull (censored),
+#' and two-phase exponential.
 #'
 #' @param x A vector with numerical ages of dated specimens.
 #' Note: if negative ages are included, the constant (-min(age) + 1) is added
@@ -26,7 +26,7 @@
 #'   information criteria for each model}
 #'   \item{model.param}{a list with fitted parameters for each model}
 #'   \item{predicted}{a data frame with predicted values for each model}
-#'   \item{best}{a data frame listing the best model basd on AIC and BIC}
+#'   \item{best}{a data frame listing the best model based on AIC and BIC}
 #'   \item{completeness}{observed completeness of a sample for a given \emph{t}}
 #'   \item{monte.carlo}{a data frame with Monte Carlo sample-level estimates of
 #'   the significance of observed incompleteness (\emph{p}), incompleteness
@@ -49,8 +49,8 @@
 #'
 #' results$monte.carlo
 #'
-#' @importFrom stats quantile runif rexp rweibull rlnorm rnorm rbeta
-#' @importFrom stats AIC BIC optim dunif dnorm dlnorm dexp dweibull
+#' @importFrom stats quantile runif rexp rweibull rlnorm rnorm rbeta rbinom
+#' @importFrom stats AIC BIC optim dunif dnorm dlnorm dexp dweibull approx
 #' @importFrom MASS fitdistr
 #'
 #' @export
@@ -186,18 +186,22 @@ tamodels <- function(x, times=1000, t = 100) {
   for (i in 1:times)
     rcomp.wei[i] <- comp.F(stats::rweibull(n.obs, shape=fit.wei$estimate["shape"],
                                            scale=fit.wei$estimate["scale"]), t=t)
-# MC weibull (censored) (NEEDS TO BE CHECKED)
+  # MC weibull (censored)
   rcomp.weic <- vector(mode='numeric', length=times)
   for (i in 1:times)
-    rcomp.weic[i] <- comp.F(stats::rweibull(n.obs, shape=exp(fit1$par[2]),
-                                           scale=1/exp(fit1$par[1])), t=t)
-# Two phase exponential (NEEDS TO BE FIXED)
+    rcomp.weic[i] <- comp.F(rcensweibull(n.obs,
+                                              cens.weibullrate=exp(fit1$par[1]),
+                                              cens.weibullshape=exp(fit1$par[2]),
+                                              time=ceiling(max(x))), t=t)
+# Two phase exponential
   rcomp.two.phase.exp <- vector(mode='numeric', length=times)
   for (i in 1:times)
-    rcomp.two.phase.exp[i] <- comp.F(stats::rbeta(n.obs, shape1=r1,
-                                            shape2=r2, ncp=beta), t=t)
+    rcomp.two.phase.exp[i] <- comp.F(r2exp(n.obs, r1=r1,
+                                              r2=r2, beta=beta,
+                                              time=ceiling(max(x))),
+                                          t=t)
 # MC model summary
-uniformMC <- data.frame(p = (sum(rcomp.unif[-1] <= obs.comp) + 1)/times,
+  uniformMC <- data.frame(p = (sum(rcomp.unif[-1] <= obs.comp) + 1)/times,
                         predicted = mean(rcomp.unif),
                         CI.lower = stats::quantile(rcomp.unif, 0.025),
                         CI.upper = stats::quantile(rcomp.unif, 0.975),
@@ -234,7 +238,8 @@ two.phase.exp <- data.frame(p = (sum(rcomp.two.phase.exp[-1] <= obs.comp) + 1)/t
                             observed = obs.comp)
 monte.carlo <- rbind(uniform=uniformMC, normal=normalMC, lognormal=lognormalMC,
                      exponential=exponentialMC, weibull=weibullMC,
-                     weibull.censored=weibull.cenMC, two.phase.exp=two.phase.exp)
+                     weibull.censored=weibull.cenMC,
+                     two.phase.exp=two.phase.exp)
   return(list(models = as.data.frame(models),
               model.param = model.param,
               predicted = predicted,
