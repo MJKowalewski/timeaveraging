@@ -57,6 +57,7 @@
 #' @export
 
 tamodels <- function(x, times=1000, t = 100) {
+  x <- as.numeric(unlist(x))
   if (min(x) <= 0) warning(paste('negative ages (BP?) converted by adding', paste(-min(x)+1), 'years'))
   if (min(x) <= 0) x <- x - min(x) + 1
   # observed values
@@ -82,28 +83,34 @@ tamodels <- function(x, times=1000, t = 100) {
   # gamma
   m.g <- mean(x)
   v.g <- var(x)
-  start_gam <- list(shape = m.g^2 / v.g, rate = m.g / v.g)
-  fit.gam <- tryCatch(
-    {
+  if (length(x) >= 2 && stats::var(x) > 0) {
+    m.g <- mean(x)
+    v.g <- stats::var(x)
+    start_gam <- list(shape = m.g^2 / v.g, rate = m.g / v.g)
+    fit.gam <- tryCatch(
       MASS::fitdistr(
         x,
         densfun = "gamma",
         start   = start_gam,
         lower   = c(1e-6, 1e-8),
         control = list(ndeps = c(1e-6, 1e-8))
-      )
-    },
-    error = function(e) NULL
-  )
-  aic.gam <- if (!is.null(fit.gam)) stats::AIC(fit.gam) else NA_real_
-  bic.gam <- if (!is.null(fit.gam)) stats::BIC(fit.gam) else NA_real_
-  #fit.gam <- MASS::fitdistr(x, "gamma",
-  #                          start = start_gam,
-  #                          lower   = c(1e-6, 1e-8),
-  #                          control = list(ndeps = c(1e-6, 1e-8)))
-  #aic.gam <- stats::AIC(fit.gam)
-  #bic.gam <- stats::BIC(fit.gam)
-  # weibull uncensored
+      ),
+      error = function(e) NULL
+    )
+  } else {
+    fit.gam <- NULL
+  }
+  if (!is.null(fit.gam)) {
+    aic.gam  <- stats::AIC(fit.gam)
+    bic.gam  <- stats::BIC(fit.gam)
+    pred.gam <- stats::dgamma(x,
+                              shape = fit.gam$estimate["shape"],
+                              rate  = fit.gam$estimate["rate"])
+  } else {
+    aic.gam  <- NA_real_
+    bic.gam  <- NA_real_
+    pred.gam <- rep(NA_real_, length(pred.x))
+  }
   fit.wei <- MASS::fitdistr(x, densfun="weibull",
                             start=list(shape = 1, scale = mean(x)),
                             lower=c(0.001, 0.001))
