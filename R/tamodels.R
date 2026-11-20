@@ -83,13 +83,20 @@ tamodels <- function(x, times=1000, t = 100) {
   m.g <- mean(x)
   v.g <- var(x)
   start_gam <- list(shape = m.g^2 / v.g, rate = m.g / v.g)
-  fit.gam <- MASS::fitdistr(x,
-                            densfun = "gamma",
-                            start   = start_gam,
-                            lower   = c(1e-6, 1e-8),
-                            control = list(ndeps = c(1e-6, 1e-8)))
-  aic.gam <- stats::AIC(fit.gam)
-  bic.gam <- stats::BIC(fit.gam)
+  fit.gam <- tryCatch(
+    {
+      MASS::fitdistr(
+        x,
+        densfun = "gamma",
+        start   = start_gam,
+        lower   = c(1e-6, 1e-8),
+        control = list(ndeps = c(1e-6, 1e-8))
+      )
+    },
+    error = function(e) NULL
+  )
+  aic.gam <- if (!is.null(fit.gam)) stats::AIC(fit.gam) else NA_real_
+  bic.gam <- if (!is.null(fit.gam)) stats::BIC(fit.gam) else NA_real_
   #fit.gam <- MASS::fitdistr(x, "gamma",
   #                          start = start_gam,
   #                          lower   = c(1e-6, 1e-8),
