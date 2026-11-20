@@ -77,7 +77,7 @@ tamodelgroups <- function(x, times=1000, t=100) {
   names(best.BIC) <- names(x)
   mc.out <- do.call(rbind, lapply(out, `[[`, 'monte.carlo'))
   mc.estimates <- data.frame(sample = rep(names(out), each=n.models),
-                             model = rep(colnames(models.AIC)[-1], 2),
+                             model = rep(colnames(models.AIC)[-1], length(names(out))),
                              mc.out,
                              BICn=rep(best.BIC, each=n.models),
                              AICn=rep(best.AIC, each=n.models),

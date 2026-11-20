@@ -161,11 +161,9 @@ tamodels <- function(x, times=1000, t = 100) {
   wr <- 1/fit.wei$estimate[2]
   ws <- fit.wei$estimate[1]
   pred.weib <- ws * wr * (pred.x * wr)^(ws-1) * exp(-(wr * pred.x)^ws)
-  pred.weib2 <- stats::dweibull(pred.x, shape = wr, scale = ws)
   cwr <- exp(fit1$par[1])
   cws <- exp(fit1$par[2])
   pred.cweib <- (1/((1/cwr)*gamma(1+1/cws)))*exp(-(cwr*pred.x)^cws)
-  pred.cweib2 <- stats::dweibull(pred.x, shape = cwr, scale = cws)
   pred.2exp <- r1 * exp(-r1*pred.x) * beta + r2 * exp(-r2*pred.x) * (1 - beta)
   predicted <- data.frame(x=pred.x,
                           uniform=(pred.uni/sum(pred.uni))*length(x),
