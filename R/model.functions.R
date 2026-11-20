@@ -19,54 +19,6 @@ weibull.censored <- function(parameter, x) {
   return(-sum(lik))
 }
 
-# DENSITY FOR RANDOM-TIME 2-PHASE EXPONENTIAL MODEL (CENSORED)
-two.phase.exponential <- function(x, niters=10000, a=2, b=0.001, rmean=mean(x)) {
-  N <- length(x)
-  d <- function(y){
-    r1 * exp(-r1 * y) * beta + r2 * exp(-r2 * y) * (1 - beta)
-  }
-  beta <- 0.5
-  r1 <- 1
-  r2 <- 1
-  best <- c(beta, r1, r2)
-  dbest <- sum(log(d(x)))
-  cluster <- stats::rbinom(N, 1, beta)
-  c <- which(cluster == 1)
-  for (iter in 1:niters) {
-    beta <- stats::rbeta(1, a + length(c), a + N - length(c))
-    r1 <- stats::rgamma(1, b + length(c), rate=rmean * b + sum(x[c]))
-    r2 <- stats::rgamma(1, b + N - length(c), rate=rmean * b + sum(x[-c]))
-    L1 <- beta * r1 * exp(-r1 * x)
-    L2 <- (1 - beta) * r2 * exp(-r2 * x)
-    cluster <- stats::rbinom(N, 1, L1/(L1 + L2))
-    c <- which(cluster==1)
-    dnew <- sum(log(d(x)))
-    if (dnew > dbest) {
-      dbest <- dnew
-      best <- c(beta, r1, r2)
-    }
-  }
-  beta <- best[1]
-  r1 <- best[2]
-  r2 <- best[3]
-  if (r1 > r2) {
-    beta <- 1 - beta
-    r1temp <- r1
-    r1 <- r2
-    r2 <- r1temp
-    }
-  out=list()
-  out$beta <- beta
-  out$r1 <- r1
-  out$r2 <- r2
-  out$alpha <- (beta * r1) / (beta * r1 + (1 - beta) * r2)
-  out$tau <- out$alpha * (r2 - r1)
-  out$lambda1 <- r2 - out$tau
-  out$lambda2 <- r1
-  out$lik <- dbest
-  out
-}
-
 #RANDOM GENERATION FOR THE CENSORED WEIBULL DISTRIBUTION
 rcensweibull=function(n.obs, cens.weibullrate, cens.weibullshape, time) {
   time.steps=1:time
@@ -83,4 +35,68 @@ r2exp=function(n.obs, r1, r2, beta, time) {
   app=stats::approx(x=time.steps, y = pdf.2.exp, method = "linear", n=10000)
   out=sample(app$x, n.obs, prob=app$y, replace=T)
   return(out)
+}
+
+two.phase.exponential <- function(x, niters = 10000, a = 2, b = 0.001, rmean = mean(x)) {
+  x <- as.numeric(unlist(x))
+  N <- length(x)
+
+  # Log-density helper using log-sum-exp to prevent -Inf
+  log_dens <- function(y, beta, r1, r2) {
+    l1 <- log(beta) + log(r1) - r1 * y
+    l2 <- log(1 - beta) + log(r2) - r2 * y
+    m  <- pmax(l1, l2)
+    m + log(exp(l1 - m) + exp(l2 - m))
+  }
+
+  beta  <- 0.5
+  r1    <- 1 / rmean
+  r2    <- 1 / rmean
+  best  <- c(beta, r1, r2)
+  dbest <- sum(log_dens(x, beta, r1, r2))
+
+  is_c1 <- stats::rbinom(N, 1, beta) == 1
+
+  for (iter in 1:niters) {
+    n1 <- sum(is_c1)
+    n2 <- N - n1
+
+    beta <- stats::rbeta(1, a + n1, a + n2)
+    r1   <- stats::rgamma(1, b + n1, rate = rmean * b + sum(x[is_c1]))
+    r2   <- stats::rgamma(1, b + n2, rate = rmean * b + sum(x[!is_c1]))
+
+    log_L1 <- log(beta) + log(r1) - r1 * x
+    log_L2 <- log(1 - beta) + log(r2) - r2 * x
+    prob1  <- stats::plogis(log_L1 - log_L2)
+
+    is_c1 <- stats::rbinom(N, 1, prob1) == 1
+
+    dnew <- sum(log_dens(x, beta, r1, r2))
+    if (dnew > dbest) {
+      dbest <- dnew
+      best  <- c(beta, r1, r2)
+    }
+  }
+
+  beta <- best[1]
+  r1   <- best[2]
+  r2   <- best[3]
+
+  if (r1 > r2) {
+    beta   <- 1 - beta
+    r1temp <- r1
+    r1     <- r2
+    r2     <- r1temp
+  }
+
+  out <- list()
+  out$beta    <- beta
+  out$r1      <- r1
+  out$r2      <- r2
+  out$alpha   <- (beta * r1) / (beta * r1 + (1 - beta) * r2)
+  out$tau     <- out$alpha * (r2 - r1)
+  out$lambda1 <- r2 - out$tau
+  out$lambda2 <- r1
+  out$lik     <- dbest
+  out
 }
