@@ -1,5 +1,13 @@
 # model functions
 
+# COMPLETENESS FUNCTION
+comp.F <- function(y, t = t) {
+  bins <- floor(y/t)
+  range <- max(bins) - min(bins) + 1
+  k <- length(unique(bins))
+  return(k/range)
+}
+
 # DENSITY FOR CENSORED WEIBULL
 weibull.censored <- function(parameter, x) {
   parameter[1] <- exp(parameter[1])

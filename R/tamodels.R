@@ -9,7 +9,7 @@
 #' (time intervals) containing specimens. The incompleteness estimates
 #' are compared against predictions of the Monte Carlo models derived for
 #' theoretical distributions. The following models are included: uniform,
-#' normal, lognormal, exponential, Weibull (uncensored), Weibull (censored),
+#' normal, lognormal, exponential, gamma, Weibull (uncensored), Weibull (censored),
 #' and two-phase exponential.
 #'
 #' @param x A vector with numerical ages of dated specimens.
@@ -49,8 +49,9 @@
 #'
 #' results$monte.carlo
 #'
-#' @importFrom stats quantile runif rexp rweibull rlnorm rnorm rbeta rbinom
-#' @importFrom stats AIC BIC optim dunif dnorm dlnorm dexp dweibull approx
+#' @importFrom stats runif rexp rweibull rlnorm rnorm rbeta rbinom rgamma
+#' @importFrom stats AIC BIC optim approx quantile
+#' @importFrom stats dunif dnorm dlnorm dexp dweibull dgamma
 #' @importFrom MASS fitdistr
 #'
 #' @export
@@ -58,16 +59,10 @@
 tamodels <- function(x, times=1000, t = 100) {
   if (min(x) < 0) warning(paste('negative ages (BP?) converted by adding', paste(-min(x)+1), 'years'))
   if (min(x) < 0) x <- x - min(x) + 1
+  # observed values
   n.obs <- length(x)
-  # completeness function
-  comp.F <- function(y, t = t) {
-    bins <- floor(y/t)
-    range <- max(bins) - min(bins) + 1
-    k <- length(unique(bins))
-    return(k/range)
-  }
   obs.comp <- comp.F(x, t = t)
-  # Fit models
+  # fit models
   # uniform
   aic.unif <- 2 * 2 - 2 * (-n.obs * log(max(x) - min(x)))
   ll.unif <- -n.obs * log(max(x) - min(x))
@@ -84,6 +79,16 @@ tamodels <- function(x, times=1000, t = 100) {
   fit.exp <- MASS::fitdistr(x, "exponential")
   aic.exp <- stats::AIC(fit.exp)
   bic.exp <- stats::BIC(fit.exp)
+  # gamma
+  m.g <- mean(x)
+  v.g <- var(x)
+  start_gam <- list(shape = m.g^2 / v.g, rate = m.g / v.g)
+  fit.gam <- MASS::fitdistr(x, "gamma",
+                            start = start_gam,
+                            lower   = c(1e-6, 1e-8),
+                            control = list(ndeps = c(1e-6, 1e-8)))
+  aic.gam <- stats::AIC(fit.gam)
+  bic.gam <- stats::BIC(fit.gam)
   # weibull uncensored
   fit.wei <- MASS::fitdistr(x, densfun="weibull",
                             start=list(shape = 1, scale = mean(x)),
@@ -111,14 +116,22 @@ tamodels <- function(x, times=1000, t = 100) {
   lambda1 <- out$r1*out$alpha+out$r2*(1-out$alpha)
   lambda2 <- out$r1 #disintegration in the SZ and burial below it
 # AIC and BIC comparison. All models.
-  models <- rbind(AIC=c(uniform = aic.unif, normal = aic.nor,
+  models <- rbind(AIC=c(uniform = aic.unif,
+                        normal = aic.nor,
                         lognormal=aic.lnor,
-                        exponential = aic.exp, weibull = aic.wei,
-                        weibull.cen = aic.wei.c, two.phase.exp = aic.two.phase),
-                  BIC=c(uniform = bic.unif, normal = bic.nor,
+                        exponential = aic.exp,
+                        gamma = aic.gam,
+                        weibull = aic.wei,
+                        weibull.cen = aic.wei.c,
+                        two.phase.exp = aic.two.phase),
+                  BIC=c(uniform = bic.unif,
+                        normal = bic.nor,
                         lognormal=bic.lnor,
-                        exponential = bic.exp, weibull = bic.wei,
-                        weibull.cen = bic.wei.c, two.phase.exp = bic.two.phase))
+                        exponential = bic.exp,
+                        gamma = bic.gam,
+                        weibull = bic.wei,
+                        weibull.cen = bic.wei.c,
+                        two.phase.exp = bic.two.phase))
   best.models <- c(AIC=colnames(models)[which(models[1,] == min(models[1,]))],
                    BIC=colnames(models)[which(models[2,] == min(models[2,]))])
 # model parameters
@@ -128,6 +141,8 @@ tamodels <- function(x, times=1000, t = 100) {
                       lognormal=c(fit.lnor$estimate["meanlog"],
                                   fit.lnor$estimate["sdlog"]),
                       exponential=fit.exp$estimate["rate"],
+                      gamma=c(fit.exp$estimate["shape"],
+                              fit.exp$estimate["rate"]),
                       weibull=c(shape=as.numeric(fit.wei$estimate["shape"]),
                                 rate=as.numeric(1/fit.wei$estimate["scale"])),
                       weibull.cen=c(shape=exp(fit1$par[2]),
@@ -137,6 +152,8 @@ tamodels <- function(x, times=1000, t = 100) {
   pred.x <- seq(0, max(x), t) + t/2
   pred.uni <- stats::dunif(pred.x, min=min(x), max=max(x)+t/2)
   pred.exp <- stats::dexp(pred.x, rate = fit.exp$estimate["rate"])
+  pred.gam <- stats::dgamma(pred.x, shape=fit.gam$estimate["shape"],
+                            rate = fit.gam$estimate["rate"])
   pred.nor <- stats::dnorm(pred.x, mean = fit.nor$estimate["mean"],
                            sd = fit.nor$estimate["sd"])
   pred.lnor <- stats::dlnorm(pred.x, meanlog = fit.lnor$estimate["meanlog"],
@@ -155,6 +172,7 @@ tamodels <- function(x, times=1000, t = 100) {
                           normal=(pred.nor/sum(pred.nor))*length(x),
                           lognormal=(pred.lnor/sum(pred.lnor))*length(x),
                           exponential=(pred.exp/sum(pred.exp))*length(x),
+                          gamma=(pred.gam/sum(pred.gam))*length(x),
                           weibull=(pred.weib/sum(pred.weib))*length(x),
                           weibull.cen=(pred.cweib/sum(pred.weib))*length(x),
                           two.phase.exp=(pred.2exp/sum(pred.2exp))*length(x))
@@ -181,12 +199,19 @@ tamodels <- function(x, times=1000, t = 100) {
   for (i in 1:times)
     rcomp.exp[i] <- comp.F(stats::rexp(n.obs,
                                        rate=fit.exp$estimate["rate"]), t=t)
+# MC gamma
+  rcomp.gam <- vector(mode='numeric', length=times)
+  for (i in 1:times)
+    rcomp.gam[i] <- comp.F (stats::rgamma(n.obs,
+                                          shape=fit.gam$estimate["shape"],
+                                          rate = fit.gam$estimate["rate"]),
+                            t=t)
 # MC weibull (uncensored) (NEEDS TO BE CHECKED)
   rcomp.wei <- vector(mode='numeric', length=times)
   for (i in 1:times)
     rcomp.wei[i] <- comp.F(stats::rweibull(n.obs, shape=fit.wei$estimate["shape"],
                                            scale=fit.wei$estimate["scale"]), t=t)
-  # MC weibull (censored)
+# MC weibull (censored)
   rcomp.weic <- vector(mode='numeric', length=times)
   for (i in 1:times)
     rcomp.weic[i] <- comp.F(rcensweibull(n.obs,
@@ -221,6 +246,11 @@ exponentialMC <- data.frame(p = (sum(rcomp.exp[-1] <= obs.comp) + 1)/times,
                             CI.lower = stats::quantile(rcomp.exp, 0.025),
                             CI.upper = stats::quantile(rcomp.exp, 0.975),
                             observed = obs.comp)
+gammaMC <- data.frame(p = (sum(rcomp.gam[-1] <= obs.comp) + 1)/times,
+                            predicted = mean(rcomp.gam),
+                            CI.lower = stats::quantile(rcomp.gam, 0.025),
+                            CI.upper = stats::quantile(rcomp.gam, 0.975),
+                            observed = obs.comp)
 weibullMC <- data.frame(p = (sum(rcomp.wei[-1] <= obs.comp) + 1)/times,
                         predicted = mean(rcomp.wei),
                         CI.lower = stats::quantile(rcomp.wei, 0.025),
@@ -237,7 +267,7 @@ two.phase.exp <- data.frame(p = (sum(rcomp.two.phase.exp[-1] <= obs.comp) + 1)/t
                             CI.upper = stats::quantile(rcomp.two.phase.exp, 0.975, na.rm=TRUE),
                             observed = obs.comp)
 monte.carlo <- rbind(uniform=uniformMC, normal=normalMC, lognormal=lognormalMC,
-                     exponential=exponentialMC, weibull=weibullMC,
+                     exponential=exponentialMC, gamma=gammaMC, weibull=weibullMC,
                      weibull.censored=weibull.cenMC,
                      two.phase.exp=two.phase.exp)
   return(list(models = as.data.frame(models),

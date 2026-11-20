@@ -43,7 +43,7 @@ The incompleteness of a sample is estimated as the proportion of bins
 (time intervals) containing specimens. The incompleteness estimates
 are compared against predictions of the Monte Carlo models derived for
 theoretical distributions. The following models are included: uniform,
-normal, lognormal, exponential, Weibull (uncensored), Weibull (censored),
+normal, lognormal, exponential, gamma, Weibull (uncensored), Weibull (censored),
 and two-phase exponential.
 }
 \examples{

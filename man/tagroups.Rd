@@ -4,7 +4,7 @@
 \alias{tagroups}
 \title{Analysis of age distributions grouped by samples}
 \usage{
-tagroups(group, id, mcid, mcprob, mcage, size = 1000)
+tagroups(group, id, mcid, mcprob, mcage, size = 1000, boot = FALSE)
 }
 \arguments{
 \item{group}{A vector with a grouping variable to be used to group
@@ -19,6 +19,10 @@ specimens into subsets (specimen dataset).}
 \item{mcage}{A vector with ages (posterior probability dataset)}
 
 \item{size}{An integer indicating the number of iterations
+used in \code{\link{postdist}}}
+
+\item{boot}{logical (default=FALSE) indicating whether tastats.boot
+should be run (computational intensive for large sets of samples)
 used in \code{\link{postdist}}}
 }
 \value{

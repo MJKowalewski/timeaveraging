@@ -26,6 +26,11 @@
 #' @param size An integer indicating the number of iterations
 #' used in \code{\link{postdist}}
 #'
+#' @param boot logical (default=FALSE) indicating whether tastats.boot
+#' should be run (computational intensive for large sets of samples)
+#' used in \code{\link{postdist}}
+
+#'
 #' @return a list with five items:
 #'   \item{mcdist}{returns a list (length n = number of groups) of
 #'   Monte Carlo approximations (see \code{\link{postdist}})
@@ -55,7 +60,8 @@
 #'
 #' @export
 #'
-tagroups <- function(group, id, mcid, mcprob, mcage, size=1000) {
+tagroups <- function(group, id, mcid, mcprob, mcage, size=1000,
+                     boot=FALSE) {
   ngp <- length(unique(group))
   group.list <- list(NULL)
   k <- 0
@@ -66,15 +72,21 @@ tagroups <- function(group, id, mcid, mcprob, mcage, size=1000) {
           prob=mcprob[which(mcid %in% gpspec)],
           id=mcid[which(mcid %in% gpspec)])
     group.list[[k]] <- mcgroup
-    }
+    if (k%%10 == 0) print(paste0(round(100*k/length(unique(group)),1),
+                                 '% groups completed'))
+  }
   out1 <- lapply(group.list, function(x) postdist(age=x$age, prob=x$prob,
                                                 id=x$id, size=size))
   names(out1) <- unique(group)
   class(out1) <- "postdist"
   out2 <- lapply(out1, tastats)
   out2df <- as.data.frame(do.call(rbind, out2))
-  out3 <- lapply(out1, tastats.boot)
-  return(list(mcdist=out1, tasummary=out2df, taboot=do.call(rbind, out3),
+  if (boot) {
+    out3 <- lapply(out1, tastats.boot)
+    out3 <- do.call(rbind, out3)
+  }
+  if (!boot) out3 <- NA
+  return(list(mcdist=out1, tasummary=out2df, taboot=out3,
               number.groups=ngp, group.names=unique(group), iterations=size))
 }
 
