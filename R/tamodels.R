@@ -173,8 +173,8 @@ tamodels <- function(x, times=1000, t = 100) {
   pred.x <- seq(0, max(x), t) + t/2
   pred.uni <- stats::dunif(pred.x, min=min(x), max=max(x)+t/2)
   pred.exp <- stats::dexp(pred.x, rate = fit.exp$estimate["rate"])
-  pred.gam <- stats::dgamma(pred.x, shape=fit.gam$estimate["shape"],
-                            rate = fit.gam$estimate["rate"])
+  #pred.gam <- stats::dgamma(pred.x, shape=fit.gam$estimate["shape"],
+  #                          rate = fit.gam$estimate["rate"])
   pred.nor <- stats::dnorm(pred.x, mean = fit.nor$estimate["mean"],
                            sd = fit.nor$estimate["sd"])
   pred.lnor <- stats::dlnorm(pred.x, meanlog = fit.lnor$estimate["meanlog"],
@@ -191,7 +191,7 @@ tamodels <- function(x, times=1000, t = 100) {
                           normal=(pred.nor/sum(pred.nor))*length(x),
                           lognormal=(pred.lnor/sum(pred.lnor))*length(x),
                           exponential=(pred.exp/sum(pred.exp))*length(x),
-                          gamma=(pred.gam/sum(pred.gam))*length(x),
+                          gamma=NA, #(pred.gam/sum(pred.gam))*length(x),
                           weibull=(pred.weib/sum(pred.weib))*length(x),
                           weibull.cen=(pred.cweib/sum(pred.weib))*length(x),
                           two.phase.exp=(pred.2exp/sum(pred.2exp))*length(x))
