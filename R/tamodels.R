@@ -146,12 +146,25 @@ tamodels <- function(x, times=1000, t = 100) {
   bic.wei <- stats::BIC(fit.wei)
   # weibull censored
   start1 <- c(log(1 / mean(x)), log(1))
-  fit1 <- stats::optim(par = start1, fn = weibull.censored, x = x)
+  fit1 <- stats::optim(par = start1, fn = weibull.censored, x = x,
+                       method = "L-BFGS-B",
+                       lower  = c(log(1e-8), log(0.05)),
+                       upper  = c(log(1e4),  log(10)))
   cens.weibullrate  <- exp(fit1$par[1])
   cens.weibullshape <- exp(fit1$par[2])
   ll.wei.c  <- -fit1$value
   aic.wei.c <- 2 * 2 - 2 * ll.wei.c
   bic.wei.c <- 2 * log(n.obs) - 2 * ll.wei.c
+
+  start1 <- c(log(1 / mean(x)), log(1))
+  fit1 <- stats::optim(
+    par    = start1,
+    fn     = weibull.censored,
+    x      = x,
+    method = "L-BFGS-B",
+    lower  = c(log(1e-8), log(0.05)),
+    upper  = c(log(1e4),  log(10))
+  )
 #  start1 <- c(log(0.0005), log(0.1))
 #  likweibull <- fit1$value
 #  aic.wei.c <- 2 * 2 - (-2 * likweibull)
@@ -266,11 +279,16 @@ tamodels <- function(x, times=1000, t = 100) {
     rcomp.wei[i] <- comp.F(stats::rweibull(n.obs, shape=fit.wei$estimate["shape"],
                                            scale=fit.wei$estimate["scale"]), t=t)
 # MC weibull (censored)
-  rcomp.weic <- vector(mode='numeric', length=times)
-  for (i in 1:times)
-    rcomp.weic[i] <- comp.F((stats::rgamma(n.obs, shape = 1 / cens.weibullshape, rate = 1)^(1 / cens.weibullshape)) / cens.weibullrate,
-                            t = t)
-# Two phase exponential
+#  rcomp.weic <- vector(mode='numeric', length=times)
+#  for (i in 1:times)
+#    rcomp.weic[i] <- comp.F((stats::rgamma(n.obs, shape = 1 / cens.weibullshape, rate = 1)^(1 / cens.weibullshape)) / cens.weibullrate,
+#                            t = t)
+  rcomp.weic <- replicate(times, {
+    log_y <- log(stats::rgamma(n.obs, shape = 1 / cens.weibullshape, rate = 1))
+    sim   <- exp(log_y / cens.weibullshape) / cens.weibullrate
+    comp.F(sim, t = t)
+  })
+  # Two phase exponential
   #rcomp.two.phase.exp <- vector(mode='numeric', length=times)
   #for (i in 1:times)
   #  rcomp.two.phase.exp[i] <- comp.F(r2exp(n.obs, r1=r1,
