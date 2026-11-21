@@ -109,7 +109,7 @@ tamodels <- function(x, times=1000, t = 100) {
   } else {
     aic.gam  <- NA_real_
     bic.gam  <- NA_real_
-    pred.gam <- rep(NA_real_, length(pred.x))
+    pred.gam <- rep(NA_real_, length(x))
   }
   fit.wei <- MASS::fitdistr(x, densfun="weibull",
                             start=list(shape = 1, scale = mean(x)),
