@@ -65,6 +65,8 @@ tamodelgroups <- function(x, times=1000, t=100) {
   models.AIC <- data.frame(samples=names(x),
                       models[grep('AIC', rownames(models)),],
                       row.names=NULL)
+  find.model <- apply(models.AIC[,-1], 1, function(x) which(x == min(x)))
+  best.predict2 <- colnames(models.AIC)[-1][find.model]
   n.models <- ncol(models.AIC) - 1
   sel.model.AIC <- apply(models.AIC, 1, function(x) which(x == min(x)))
   best.AIC <- colnames(models.AIC)[sel.model.AIC]
@@ -92,6 +94,7 @@ tamodelgroups <- function(x, times=1000, t=100) {
               model.param = model.param,
               model.predict = model.predict,
               best.predict = best.predict,
+              best.predict2 = best.predict2,
               monte.carlo.all=mc.all,
               monte.carlo = mc.final,
               iterations = out[[1]]$iterations,
