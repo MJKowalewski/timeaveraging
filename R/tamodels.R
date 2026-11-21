@@ -108,37 +108,6 @@ tamodels <- function(x, times=1000, t = 100) {
   fit.gam <- fit.gamma.F(x)
   aic.gam <- stats::AIC(fit.gam)
   bic.gam <- stats::BIC(fit.gam)
-
-#  m.g <- mean(x)
-#  v.g <- var(x)
-#  if (length(x) >= 2 && stats::var(x) > 0) {
-#    m.g <- mean(x)
-#    v.g <- stats::var(x)
-#    start_gam <- list(shape = m.g^2 / v.g, rate = m.g / v.g)
-#    fit.gam <- tryCatch(
-#      MASS::fitdistr(
-#        x,
-#        densfun = "gamma",
-#        start   = start_gam,
-#        lower   = c(1e-6, 1e-8),
-#        control = list(ndeps = c(1e-6, 1e-8))
-#      ),
-#      error = function(e) NULL
-#    )
-#  } else {
-#    fit.gam <- NULL
-#  }
-#  if (!is.null(fit.gam)) {
-#    aic.gam  <- stats::AIC(fit.gam)
-#    bic.gam  <- stats::BIC(fit.gam)
-#    pred.gam <- stats::dgamma(x,
-#                              shape = fit.gam$estimate["shape"],
-#                              rate  = fit.gam$estimate["rate"])
-#  } else {
-#    aic.gam  <- NA_real_
-#    bic.gam  <- NA_real_
-#    pred.gam <- rep(NA_real_, length(x))
-#  }
   fit.wei <- MASS::fitdistr(x, densfun="weibull",
                             start=list(shape = 1, scale = mean(x)),
                             lower=c(0.001, 0.001))
@@ -165,10 +134,6 @@ tamodels <- function(x, times=1000, t = 100) {
     lower  = c(log(1e-8), log(0.05)),
     upper  = c(log(1e4),  log(10))
   )
-#  start1 <- c(log(0.0005), log(0.1))
-#  likweibull <- fit1$value
-#  aic.wei.c <- 2 * 2 - (-2 * likweibull)
-#  bic.wei.c <- aic.wei.c+((2*2*(2+1))/(length(x)-2-1))
   # two-phase exponential
   out <- two.phase.exponential(x)
   ll.two.phase  <- out$lik
@@ -176,8 +141,6 @@ tamodels <- function(x, times=1000, t = 100) {
   k <- 3
   aic.two.phase <- 2 * k - 2 * ll.two.phase
   bic.two.phase <- k * log(n.obs) - 2 * ll.two.phase
-#  aic.two.phase <- 2 * k - (-2 * lik)
-#  bic.two.phase <- aic.two.phase + ((2 * k * (k + 1)) / (length(x) - k -1))
   beta <- out$beta
   r1 <- out$r1
   r2 <- out$r2
@@ -201,8 +164,6 @@ tamodels <- function(x, times=1000, t = 100) {
                         weibull = bic.wei,
                         weibull.cen = bic.wei.c,
                         two.phase.exp = bic.two.phase))
-  best.models <- c(AIC=colnames(models)[which(models[1,] == min(models[1,]))],
-                   BIC=colnames(models)[which(models[2,] == min(models[2,]))])
 # model parameters
   model.param <- list(uniform=c(min=a_unif, max=b_unif),
                       normal=c(fit.nor$estimate["mean"],
@@ -243,7 +204,6 @@ tamodels <- function(x, times=1000, t = 100) {
                           weibull=(pred.weib/sum(pred.weib))*length(x),
                           weibull.cen=(pred.cweib/sum(pred.cweib))*length(x),
                           two.phase.exp=(pred.2exp/sum(pred.2exp))*length(x))
-  colnames(predicted)[colnames(predicted) == best.models["AIC"]] <- paste0(best.models["AIC"],'*')
 # MONTE CARLO COMPLETENESS MODELS
 # MC uniform
   rcomp.unif <- vector(mode='numeric', length=times)
@@ -278,23 +238,11 @@ tamodels <- function(x, times=1000, t = 100) {
   for (i in 1:times)
     rcomp.wei[i] <- comp.F(stats::rweibull(n.obs, shape=fit.wei$estimate["shape"],
                                            scale=fit.wei$estimate["scale"]), t=t)
-# MC weibull (censored)
-#  rcomp.weic <- vector(mode='numeric', length=times)
-#  for (i in 1:times)
-#    rcomp.weic[i] <- comp.F((stats::rgamma(n.obs, shape = 1 / cens.weibullshape, rate = 1)^(1 / cens.weibullshape)) / cens.weibullrate,
-#                            t = t)
   rcomp.weic <- replicate(times, {
     log_y <- log(stats::rgamma(n.obs, shape = 1 / cens.weibullshape, rate = 1))
     sim   <- exp(log_y / cens.weibullshape) / cens.weibullrate
     comp.F(sim, t = t)
   })
-  # Two phase exponential
-  #rcomp.two.phase.exp <- vector(mode='numeric', length=times)
-  #for (i in 1:times)
-  #  rcomp.two.phase.exp[i] <- comp.F(r2exp(n.obs, r1=r1,
-  #                                            r2=r2, beta=beta,
-  #                                            time=ceiling(max(x))),
-  #                                        t=t)
   rcomp.two.phase.exp <- replicate(times, {
     c1 <- stats::rbinom(n.obs, 1, out$beta) == 1
     sim <- numeric(n.obs)
@@ -347,6 +295,42 @@ monte.carlo <- rbind(uniform=uniformMC, normal=normalMC, lognormal=lognormalMC,
                      exponential=exponentialMC, gamma=gammaMC, weibull=weibullMC,
                      weibull.censored=weibull.cenMC,
                      two.phase.exp=two.phase.exp)
+# 1. Compute AICc for all models (crucial when n < 40)
+k_vec <- c(
+  uniform = 2, normal = 2, lognormal = 2, exponential = 1,
+  gamma = 2, weibull = 2, weibull.cen = 2, two.phase.exp = 3
+)
+
+aicc_vec <- models["AIC", ] + (2 * k_vec * (k_vec + 1)) / pmax(1, n.obs - k_vec - 1)
+models   <- rbind(models, AICc = aicc_vec)
+
+# 2. Align Monte Carlo p-values with column names in `models`
+# (Ensure row order of monte.carlo matches colnames(models))
+mc_p <- monte.carlo[, "p"]
+names(mc_p) <- colnames(models)
+
+# 3. Two-step selection helper
+select_best <- function(ic_values, p_values, alpha = 0.05) {
+  valid <- which(p_values >= alpha & !is.na(ic_values))
+
+  if (length(valid) > 0) {
+    # Step 2: Lowest IC among models that pass Monte Carlo GoF
+    best_idx <- valid[which.min(ic_values[valid])]
+    return(names(ic_values)[best_idx])
+  } else {
+    # Fallback: Highest Monte Carlo p-value if all models fail GoF
+    warning("No model passed Monte Carlo GoF (p >= ", alpha, "); selecting closest MC match.")
+    return(names(p_values)[which.max(p_values)])
+  }
+}
+
+best.models <- c(
+  AIC  = select_best(models["AIC", ],  mc_p),
+  AICc = select_best(models["AICc", ], mc_p),
+  BIC  = select_best(models["BIC", ],  mc_p)
+)
+win_col <- best.models["AICc"]
+colnames(predicted)[colnames(predicted) == win_col] <- paste0(win_col, "*")
   return(list(models = as.data.frame(models),
               model.param = model.param,
               predicted = predicted,
