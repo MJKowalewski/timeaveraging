@@ -58,7 +58,9 @@
 
 tamodels <- function(x, times=1000, t = 100) {
   x <- as.numeric(unlist(x))
-  if (min(x) <= 0) warning(paste('negative ages (BP?) converted by adding', paste(-min(x)+1), 'years'))
+  if (min(x) <= 0)
+    warning(paste('non-positive ages (BP?) converted by adding',
+                  paste(-min(x)+1), 'years'))
   if (min(x) <= 0) x <- x - min(x) + 1
   # observed values
   n.obs <- length(x)
@@ -98,9 +100,9 @@ tamodels <- function(x, times=1000, t = 100) {
       start   = start_gam,
       lower   = c(shape = 1e-6, rate = 1e-8),
       control = list(
-        parscale = c(start_gam$shape, start_gam$rate), # Crucial for disparate scales
-        fnscale  = length(x),                          # Keeps log-likelihood O(1)
-        ndeps    = c(1e-5, 1e-5),                      # Safe relative step size once parscale is set
+        parscale = c(start_gam$shape, start_gam$rate),
+        fnscale  = length(x),
+        ndeps    = c(1e-5, 1e-5),
         maxit    = 1000
       )
     )
@@ -233,16 +235,18 @@ tamodels <- function(x, times=1000, t = 100) {
                                           shape=fit.gam$estimate["shape"],
                                           rate = fit.gam$estimate["rate"]),
                             t=t)
-# MC weibull (uncensored) (NEEDS TO BE CHECKED)
+# MC weibull (uncensored)
   rcomp.wei <- vector(mode='numeric', length=times)
   for (i in 1:times)
     rcomp.wei[i] <- comp.F(stats::rweibull(n.obs, shape=fit.wei$estimate["shape"],
                                            scale=fit.wei$estimate["scale"]), t=t)
+# MC weibull (censored)
   rcomp.weic <- replicate(times, {
     log_y <- log(stats::rgamma(n.obs, shape = 1 / cens.weibullshape, rate = 1))
     sim   <- exp(log_y / cens.weibullshape) / cens.weibullrate
     comp.F(sim, t = t)
   })
+# MC two-phase exponential
   rcomp.two.phase.exp <- replicate(times, {
     c1 <- stats::rbinom(n.obs, 1, out$beta) == 1
     sim <- numeric(n.obs)
@@ -251,7 +255,7 @@ tamodels <- function(x, times=1000, t = 100) {
     comp.F(sim, t = t)
   })
 # MC model summary
-  uniformMC <- data.frame(p = (sum(rcomp.unif[-1] <= obs.comp) + 1)/times,
+uniformMC <- data.frame(p = (sum(rcomp.unif[-1] <= obs.comp) + 1)/times,
                         predicted = mean(rcomp.unif),
                         CI.lower = stats::quantile(rcomp.unif, 0.025),
                         CI.upper = stats::quantile(rcomp.unif, 0.975),
@@ -295,35 +299,24 @@ monte.carlo <- rbind(uniform=uniformMC, normal=normalMC, lognormal=lognormalMC,
                      exponential=exponentialMC, gamma=gammaMC, weibull=weibullMC,
                      weibull.censored=weibull.cenMC,
                      two.phase.exp=two.phase.exp)
-# 1. Compute AICc for all models (crucial when n < 40)
-k_vec <- c(
-  uniform = 2, normal = 2, lognormal = 2, exponential = 1,
-  gamma = 2, weibull = 2, weibull.cen = 2, two.phase.exp = 3
-)
-
-aicc_vec <- models["AIC", ] + (2 * k_vec * (k_vec + 1)) / pmax(1, n.obs - k_vec - 1)
-models   <- rbind(models, AICc = aicc_vec)
-
-# 2. Align Monte Carlo p-values with column names in `models`
-# (Ensure row order of monte.carlo matches colnames(models))
+# Compute AICc for all models and adjust p values for MC models
+k.vec <- c(uniform = 2, normal = 2, lognormal = 2, exponential = 1,
+           gamma = 2, weibull = 2, weibull.cen = 2, two.phase.exp = 3)
+aicc.vec <- models["AIC", ] + (2 * k.vec * (k.vec+1)) / pmax(1, n.obs-k.vec-1)
+models   <- rbind(models, AICc = aicc.vec)
 mc_p <- monte.carlo[, "p"]
 names(mc_p) <- colnames(models)
-
-# 3. Two-step selection helper
 select_best <- function(ic_values, p_values, alpha = 0.05) {
   valid <- which(p_values >= alpha & !is.na(ic_values))
-
   if (length(valid) > 0) {
-    # Step 2: Lowest IC among models that pass Monte Carlo GoF
     best_idx <- valid[which.min(ic_values[valid])]
     return(names(ic_values)[best_idx])
   } else {
-    # Fallback: Highest Monte Carlo p-value if all models fail GoF
     warning("No model passed Monte Carlo GoF (p >= ", alpha, "); selecting closest MC match.")
     return(names(p_values)[which.max(p_values)])
   }
 }
-
+# summary of best models
 best.models <- c(
   AIC  = select_best(models["AIC", ],  mc_p),
   AICc = select_best(models["AICc", ], mc_p),
