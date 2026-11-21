@@ -69,9 +69,6 @@ tamodelgroups <- function(x, times=1000, t=100) {
   models.BIC <- data.frame(samples=names(out),
                          models[grep('BIC', rownames(models)),],
                          row.names=NULL)
-  #sel.model.BIC <- apply(models.BIC, 1, function(x) which(x == min(x)))
-  #best.BIC <- colnames(models.BIC)[sel.model.BIC]
-  #names(best.BIC) <- names(x)
   extract.best <- lapply(out, '[[', 'best')
   best.AIC <- sapply(extract.best, function(x) x[rownames(x) == 'AIC',])
   best.BIC <- sapply(extract.best, function(x) x[rownames(x) == 'BIC',])
@@ -86,7 +83,7 @@ tamodelgroups <- function(x, times=1000, t=100) {
                              row.names=NULL)
   mc.estimates$AIC <- as.numeric(mc.estimates$model == mc.estimates$AICn)
   mc.estimates$BIC <- as.numeric(mc.estimates$model == mc.estimates$BICn)
-  mc.estimates$AIC <- as.numeric(mc.estimates$model == mc.estimates$AICcn)
+  mc.estimates$AICc <- as.numeric(mc.estimates$model == mc.estimates$AICcn)
   mc.all <- mc.estimates[ , !(colnames(mc.estimates) %in% c('AICn', 'BICn', 'AICcn'))]
   mc.final <- mc.all[which(mc.all$AICc == 1), ]
   return(list(AIC = models.AIC,
