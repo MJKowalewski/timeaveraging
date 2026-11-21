@@ -9,16 +9,22 @@ comp.F <- function(y, t = t) {
 }
 
 # DENSITY FOR CENSORED WEIBULL
+#weibull.censored <- function(parameter, x) {
+#  parameter[1] <- exp(parameter[1])
+#  parameter[2] <- exp(parameter[2])
+#  C <- (1/parameter[1])*gamma(1 + 1/parameter[2])
+#  lik <- (1/C) * exp(-(parameter[1] * x)^parameter[2])
+#  lik <- ifelse(lik<0.00000001, 0.00000001, lik)
+#  lik <- log(lik)
+#  return(-sum(lik))
+#}
 weibull.censored <- function(parameter, x) {
-  parameter[1] <- exp(parameter[1])
-  parameter[2] <- exp(parameter[2])
-  C <- (1/parameter[1])*gamma(1 + 1/parameter[2])
-  lik <- (1/C) * exp(-(parameter[1] * x)^parameter[2])
-  lik <- ifelse(lik<0.00000001, 0.00000001, lik)
-  lik <- log(lik)
-  return(-sum(lik))
+  rate  <- exp(parameter[1])
+  shape <- exp(parameter[2])
+  log_C <- -log(rate) + lgamma(1 + 1 / shape)
+  log_lik <- -log_C - (rate * x)^shape
+  return(-sum(log_lik))
 }
-
 #RANDOM GENERATION FOR THE CENSORED WEIBULL DISTRIBUTION
 rcensweibull=function(n.obs, cens.weibullrate, cens.weibullshape, time) {
   time.steps=1:time

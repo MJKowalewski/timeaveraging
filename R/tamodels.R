@@ -65,8 +65,11 @@ tamodels <- function(x, times=1000, t = 100) {
   obs.comp <- comp.F(x, t = t)
   # fit models
   # uniform
-  aic.unif <- 2 * 2 - 2 * (-n.obs * log(max(x) - min(x)))
-  ll.unif <- -n.obs * log(max(x) - min(x))
+  r_unif <- max(x) - min(x)
+  a_unif <- max(0, min(x) - r_unif / (n.obs - 1))
+  b_unif <- max(x) + r_unif / (n.obs - 1)
+  ll.unif  <- -n.obs * log(b_unif - a_unif)
+  aic.unif <- 2 * 2 - 2 * ll.unif
   bic.unif <- 2 * log(n.obs) - 2 * ll.unif
   #normal
   fit.nor <- MASS::fitdistr(x, "normal")
@@ -142,19 +145,26 @@ tamodels <- function(x, times=1000, t = 100) {
   aic.wei <- stats::AIC(fit.wei)
   bic.wei <- stats::BIC(fit.wei)
   # weibull censored
-  start1 <- c(log(0.0005), log(0.1))
-  fit1 <- stats::optim(par = start1, fn = weibull.censored, x=x)
-  cens.weibullrate <- exp(fit1$par[1])
+  start1 <- c(log(1 / mean(x)), log(1))
+  fit1 <- stats::optim(par = start1, fn = weibull.censored, x = x)
+  cens.weibullrate  <- exp(fit1$par[1])
   cens.weibullshape <- exp(fit1$par[2])
-  likweibull <- fit1$value
-  aic.wei.c <- 2 * 2 - (-2 * likweibull)
-  bic.wei.c <- aic.wei.c+((2*2*(2+1))/(length(x)-2-1))
+  ll.wei.c  <- -fit1$value
+  aic.wei.c <- 2 * 2 - 2 * ll.wei.c
+  bic.wei.c <- 2 * log(n.obs) - 2 * ll.wei.c
+#  start1 <- c(log(0.0005), log(0.1))
+#  likweibull <- fit1$value
+#  aic.wei.c <- 2 * 2 - (-2 * likweibull)
+#  bic.wei.c <- aic.wei.c+((2*2*(2+1))/(length(x)-2-1))
   # two-phase exponential
   out <- two.phase.exponential(x)
-  lik <- -(out$lik)
+  ll.two.phase  <- out$lik
+  #  lik <- -(out$lik)
   k <- 3
-  aic.two.phase <- 2 * k - (-2 * lik)
-  bic.two.phase <- aic.two.phase + ((2 * k * (k + 1)) / (length(x) - k -1))
+  aic.two.phase <- 2 * k - 2 * ll.two.phase
+  bic.two.phase <- k * log(n.obs) - 2 * ll.two.phase
+#  aic.two.phase <- 2 * k - (-2 * lik)
+#  bic.two.phase <- aic.two.phase + ((2 * k * (k + 1)) / (length(x) - k -1))
   beta <- out$beta
   r1 <- out$r1
   r2 <- out$r2
@@ -181,7 +191,7 @@ tamodels <- function(x, times=1000, t = 100) {
   best.models <- c(AIC=colnames(models)[which(models[1,] == min(models[1,]))],
                    BIC=colnames(models)[which(models[2,] == min(models[2,]))])
 # model parameters
-  model.param <- list(uniform=c(min=min(x), max=max(x)),
+  model.param <- list(uniform=c(min=a_unif, max=b_unif),
                       normal=c(fit.nor$estimate["mean"],
                                fit.nor$estimate["sd"]),
                       lognormal=c(fit.lnor$estimate["meanlog"],
@@ -196,7 +206,7 @@ tamodels <- function(x, times=1000, t = 100) {
                       two.phase.exp=c(rate.TAZ=lambda1, rate.SZ=lambda2, tau=tau))
 # predicted values
   pred.x <- seq(0, max(x), t) + t/2
-  pred.uni <- stats::dunif(pred.x, min=min(x), max=max(x)+t/2)
+  pred.uni <- stats::dunif(pred.x, min = a_unif, max = b_unif)
   pred.exp <- stats::dexp(pred.x, rate = fit.exp$estimate["rate"])
   pred.gam <- stats::dgamma(pred.x, shape = fit.gam$estimate["shape"],
                             rate = fit.gam$estimate["rate"])
@@ -225,7 +235,7 @@ tamodels <- function(x, times=1000, t = 100) {
 # MC uniform
   rcomp.unif <- vector(mode='numeric', length=times)
   for (i in 1:times)
-    rcomp.unif[i] <- comp.F(stats::runif(n.obs, min(x), max(x)), t=t)
+    rcomp.unif[i] <- comp.F(stats::runif(n.obs, a_unif, b_unif), t = t)
 # MC normal
   rcomp.nor <- vector(mode='numeric', length=times)
   for (i in 1:times)
@@ -258,17 +268,22 @@ tamodels <- function(x, times=1000, t = 100) {
 # MC weibull (censored)
   rcomp.weic <- vector(mode='numeric', length=times)
   for (i in 1:times)
-    rcomp.weic[i] <- comp.F(rcensweibull(n.obs,
-                                              cens.weibullrate=exp(fit1$par[1]),
-                                              cens.weibullshape=exp(fit1$par[2]),
-                                              time=ceiling(max(x))), t=t)
+    rcomp.weic[i] <- comp.F((stats::rgamma(n.obs, shape = 1 / cens.weibullshape, rate = 1)^(1 / cens.weibullshape)) / cens.weibullrate,
+                            t = t)
 # Two phase exponential
-  rcomp.two.phase.exp <- vector(mode='numeric', length=times)
-  for (i in 1:times)
-    rcomp.two.phase.exp[i] <- comp.F(r2exp(n.obs, r1=r1,
-                                              r2=r2, beta=beta,
-                                              time=ceiling(max(x))),
-                                          t=t)
+  #rcomp.two.phase.exp <- vector(mode='numeric', length=times)
+  #for (i in 1:times)
+  #  rcomp.two.phase.exp[i] <- comp.F(r2exp(n.obs, r1=r1,
+  #                                            r2=r2, beta=beta,
+  #                                            time=ceiling(max(x))),
+  #                                        t=t)
+  rcomp.two.phase.exp <- replicate(times, {
+    c1 <- stats::rbinom(n.obs, 1, out$beta) == 1
+    sim <- numeric(n.obs)
+    sim[c1]  <- stats::rexp(sum(c1), rate = out$r1)
+    sim[!c1] <- stats::rexp(sum(!c1), rate = out$r2)
+    comp.F(sim, t = t)
+  })
 # MC model summary
   uniformMC <- data.frame(p = (sum(rcomp.unif[-1] <= obs.comp) + 1)/times,
                         predicted = mean(rcomp.unif),
