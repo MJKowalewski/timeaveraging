@@ -60,23 +60,26 @@ tamodelgroups <- function(x, times=1000, t=100) {
   models <- do.call(rbind, lapply(out, `[[`, 'models'))
   model.param <- do.call(rbind, lapply(out, function(x) unlist(x[['model.param']])))
   model.predict <- simplify2array(lapply(out, function(el) as.matrix(el[['predicted']])))
-  best.predict <- lapply(model.predict,
-                         function(m) m[,grep("*", colnames(m), fixed = TRUE)])
+#  best.predict <- lapply(model.predict,
+#                         function(m) m[,grep("*", colnames(m), fixed = TRUE)])
   models.AIC <- data.frame(samples=names(x),
                       models[grep('AIC', rownames(models)),],
                       row.names=NULL)
-  find.model <- apply(models.AIC[,-1], 1, function(x) which(x == min(x)))
-  best.predict2 <- colnames(models.AIC)[-1][find.model]
+  #find.model <- apply(models.AIC[,-1], 1, function(x) which(x == min(x)))
+  #best.predict2 <- colnames(models.AIC)[-1][find.model]
   n.models <- ncol(models.AIC) - 1
-  sel.model.AIC <- apply(models.AIC, 1, function(x) which(x == min(x)))
-  best.AIC <- colnames(models.AIC)[sel.model.AIC]
-  names(best.AIC) <- names(x)
+  #sel.model.AIC <- apply(models.AIC, 1, function(x) which(x == min(x)))
+  #best.AIC <- colnames(models.AIC)[sel.model.AIC]
+  #names(best.AIC) <- names(x)
   models.BIC <- data.frame(samples=names(out),
                          models[grep('BIC', rownames(models)),],
                          row.names=NULL)
-  sel.model.BIC <- apply(models.BIC, 1, function(x) which(x == min(x)))
-  best.BIC <- colnames(models.BIC)[sel.model.BIC]
-  names(best.BIC) <- names(x)
+  #sel.model.BIC <- apply(models.BIC, 1, function(x) which(x == min(x)))
+  #best.BIC <- colnames(models.BIC)[sel.model.BIC]
+  #names(best.BIC) <- names(x)
+  extract.best <- lapply(out, '[[', 'best')
+  best.AIC <- sapply(extract.best, function(x) x[rownames(x) == 'AIC',])
+  best.BIC <- sapply(extract.best, function(x) x[rownames(x) == 'BIC',])
   mc.out <- do.call(rbind, lapply(out, `[[`, 'monte.carlo'))
   mc.estimates <- data.frame(sample = rep(names(out), each=n.models),
                              model = rep(colnames(models.AIC)[-1], length(names(out))),
@@ -87,16 +90,16 @@ tamodelgroups <- function(x, times=1000, t=100) {
   mc.estimates$AIC <- as.numeric(mc.estimates$model == mc.estimates$AICn)
   mc.estimates$BIC <- as.numeric(mc.estimates$model == mc.estimates$BICn)
   mc.all <- mc.estimates[ , !(colnames(mc.estimates) %in% c('AICn', 'BICn'))]
-  mc.final <- mc.all[which(mc.all$AIC == 1), ]
+#  mc.final <- mc.all[which(mc.all$AIC == 1), ]
   return(list(AIC = models.AIC,
               BIC = models.BIC,
               completeness=sam.est,
               model.param = model.param,
               model.predict = model.predict,
-              best.predict = best.predict,
-              best.predict2 = best.predict2,
+#              best.predict = best.predict,
+#              best.predict2 = best.predict2,
               monte.carlo.all=mc.all,
-              monte.carlo = mc.final,
+#             monte.carlo = mc.final,
               iterations = out[[1]]$iterations,
               time.bin = out[[1]]$time.bin))
 }

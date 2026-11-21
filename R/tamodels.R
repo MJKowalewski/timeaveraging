@@ -218,7 +218,7 @@ tamodels <- function(x, times=1000, t = 100) {
                           exponential=(pred.exp/sum(pred.exp))*length(x),
                           gamma=(pred.gam/sum(pred.gam))*length(x),
                           weibull=(pred.weib/sum(pred.weib))*length(x),
-                          weibull.cen=(pred.cweib/sum(pred.weib))*length(x),
+                          weibull.cen=(pred.cweib/sum(pred.cweib))*length(x),
                           two.phase.exp=(pred.2exp/sum(pred.2exp))*length(x))
   colnames(predicted)[colnames(predicted) == best.models["AIC"]] <- paste0(best.models["AIC"],'*')
 # MONTE CARLO COMPLETENESS MODELS
