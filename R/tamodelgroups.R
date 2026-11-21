@@ -93,6 +93,8 @@ tamodelgroups <- function(x, times=1000, t=100) {
 #  mc.final <- mc.all[which(mc.all$AIC == 1), ]
   return(list(AIC = models.AIC,
               BIC = models.BIC,
+              AICbest = best.AIC,
+              BICbest = best.BIC,
               completeness=sam.est,
               model.param = model.param,
               model.predict = model.predict,
