@@ -81,36 +81,61 @@ tamodels <- function(x, times=1000, t = 100) {
   aic.exp <- stats::AIC(fit.exp)
   bic.exp <- stats::BIC(fit.exp)
   # gamma
-  m.g <- mean(x)
-  v.g <- var(x)
-  if (length(x) >= 2 && stats::var(x) > 0) {
-    m.g <- mean(x)
-    v.g <- stats::var(x)
-    start_gam <- list(shape = m.g^2 / v.g, rate = m.g / v.g)
-    fit.gam <- tryCatch(
-      MASS::fitdistr(
-        x,
-        densfun = "gamma",
-        start   = start_gam,
-        lower   = c(1e-6, 1e-8),
-        control = list(ndeps = c(1e-6, 1e-8))
-      ),
-      error = function(e) NULL
+  fit.gamma.F <- function(x) {
+    m <- mean(x)
+    v <- var(x)
+    if (v < .Machine$double.eps) v <- (m * 1e-3)^2
+    start_gam <- list(
+      shape = max(m^2 / v, 1e-4),
+      rate  = max(m / v, 1e-6)
     )
-  } else {
-    fit.gam <- NULL
+    MASS::fitdistr(
+      x,
+      densfun = "gamma",
+      start   = start_gam,
+      lower   = c(shape = 1e-6, rate = 1e-8),
+      control = list(
+        parscale = c(start_gam$shape, start_gam$rate), # Crucial for disparate scales
+        fnscale  = length(x),                          # Keeps log-likelihood O(1)
+        ndeps    = c(1e-5, 1e-5),                      # Safe relative step size once parscale is set
+        maxit    = 1000
+      )
+    )
   }
-  if (!is.null(fit.gam)) {
-    aic.gam  <- stats::AIC(fit.gam)
-    bic.gam  <- stats::BIC(fit.gam)
-    pred.gam <- stats::dgamma(x,
-                              shape = fit.gam$estimate["shape"],
-                              rate  = fit.gam$estimate["rate"])
-  } else {
-    aic.gam  <- NA_real_
-    bic.gam  <- NA_real_
-    pred.gam <- rep(NA_real_, length(x))
-  }
+  fit.gam <- fit.gamma.F(x)
+  aic.gam <- stats::AIC(fit.gam)
+  bic.gam <- stats::BIC(fit.gam)
+
+#  m.g <- mean(x)
+#  v.g <- var(x)
+#  if (length(x) >= 2 && stats::var(x) > 0) {
+#    m.g <- mean(x)
+#    v.g <- stats::var(x)
+#    start_gam <- list(shape = m.g^2 / v.g, rate = m.g / v.g)
+#    fit.gam <- tryCatch(
+#      MASS::fitdistr(
+#        x,
+#        densfun = "gamma",
+#        start   = start_gam,
+#        lower   = c(1e-6, 1e-8),
+#        control = list(ndeps = c(1e-6, 1e-8))
+#      ),
+#      error = function(e) NULL
+#    )
+#  } else {
+#    fit.gam <- NULL
+#  }
+#  if (!is.null(fit.gam)) {
+#    aic.gam  <- stats::AIC(fit.gam)
+#    bic.gam  <- stats::BIC(fit.gam)
+#    pred.gam <- stats::dgamma(x,
+#                              shape = fit.gam$estimate["shape"],
+#                              rate  = fit.gam$estimate["rate"])
+#  } else {
+#    aic.gam  <- NA_real_
+#    bic.gam  <- NA_real_
+#    pred.gam <- rep(NA_real_, length(x))
+#  }
   fit.wei <- MASS::fitdistr(x, densfun="weibull",
                             start=list(shape = 1, scale = mean(x)),
                             lower=c(0.001, 0.001))
@@ -173,8 +198,8 @@ tamodels <- function(x, times=1000, t = 100) {
   pred.x <- seq(0, max(x), t) + t/2
   pred.uni <- stats::dunif(pred.x, min=min(x), max=max(x)+t/2)
   pred.exp <- stats::dexp(pred.x, rate = fit.exp$estimate["rate"])
-  #pred.gam <- stats::dgamma(pred.x, shape=fit.gam$estimate["shape"],
-  #                          rate = fit.gam$estimate["rate"])
+  pred.gam <- stats::dgamma(pred.x, shape=fit.gam$estimate["shape"],
+                            rate = fit.gam$estimate["rate"])
   pred.nor <- stats::dnorm(pred.x, mean = fit.nor$estimate["mean"],
                            sd = fit.nor$estimate["sd"])
   pred.lnor <- stats::dlnorm(pred.x, meanlog = fit.lnor$estimate["meanlog"],
