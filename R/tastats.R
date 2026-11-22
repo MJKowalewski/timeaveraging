@@ -111,7 +111,7 @@ tastats <- function(x, use.median=TRUE, simple=TRUE) {
   l2 <- lmom[1]
   l3 <- lmom[2]
   my.stats <- data.frame(median.age, mean.age, STD2=2*std.age, IQR=iq.age,
-                         ETA2SD=ETA, ETA50=IQR, L2=l2, G1=g1, L3=l3)
+                         ETA2SD=ETA, ETA50=IQR, L2=l2, G1=g1, L3=l3, n=nspec)
   rownames(my.stats) <- 'estimate'
   if (simple) return(my.stats)
   if (!simple) return(list(my.stats, ages=y, n=nspec, num.replic=iter,
